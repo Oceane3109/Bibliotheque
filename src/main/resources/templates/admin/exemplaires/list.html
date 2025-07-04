@@ -35,7 +35,6 @@
                 <tr>
                     <th>Code exemplaire</th>
                     <th>État</th>
-                    <th>Date d'acquisition</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -52,7 +51,6 @@
                             État
                         </span>
                     </td>
-                    <td th:text="${#temporals.format(exemplaire.dateAcquisition, 'dd/MM/yyyy')}">Date</td>
                     <td>
                         <a th:href="@{/admin/exemplaires/edit/{id}(id=${exemplaire.idExemplaire})}" class="btn btn-warning btn-sm me-2">
                             <i class="bi bi-pencil"></i> Modifier

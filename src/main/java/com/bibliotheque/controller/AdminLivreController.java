@@ -33,7 +33,7 @@ public class AdminLivreController {
 
     @GetMapping("/{id}")
     public String detailLivreAdmin(@PathVariable Long id, Model model) {
-        Livre livre = livreService.getLivreById(id).orElseThrow();
+        Livre livre = livreService.getLivreWithExemplairesById(id).orElseThrow();
         model.addAttribute("livre", livre);
         return "admin/livres/detail";
     }

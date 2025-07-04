@@ -27,4 +27,6 @@ public interface LivreService {
     byte[] getImageData(Long livreId);
 
     List<Livre> getAllLivresWithExemplaires();
+
+    Optional<Livre> getLivreWithExemplairesById(Long id);
 } 
