@@ -55,8 +55,8 @@
                 <tr th:each="pretAvecTemps : ${pretsAvecTempsRestant}">
                     <td th:text="${pretAvecTemps[0].exemplaire.livre.titre}">Livre</td>
                     <td th:text="${pretAvecTemps[0].exemplaire.codeExemplaire}">Exemplaire</td>
-                    <td th:text="${#temporals.format(pretAvecTemps[0].datePret, 'dd/MM/yyyy')}">Date prêt</td>
-                    <td th:text="${#temporals.format(pretAvecTemps[0].dateFinPret, 'dd/MM/yyyy')}">Date retour</td>
+                    <td th:text="${#temporals.format(pretAvecTemps[0].dateDebut, 'dd/MM/yyyy')}">Date prêt</td>
+                    <td th:text="${#temporals.format(pretAvecTemps[0].dateFin, 'dd/MM/yyyy')}">Date retour</td>
                     <td>
                         <span th:if="${pretAvecTemps[1] > 0}" th:text="${pretAvecTemps[1]} + ' jour(s)'">Temps restant</span>
                         <span th:if="${pretAvecTemps[1] == 0}">Dernier jour !</span>
@@ -83,8 +83,8 @@
                 <tr th:each="pret : ${pretsRetard}">
                     <td th:text="${pret.exemplaire.livre.titre}">Livre</td>
                     <td th:text="${pret.exemplaire.codeExemplaire}">Exemplaire</td>
-                    <td th:text="${#temporals.format(pret.datePret, 'dd/MM/yyyy')}">Date prêt</td>
-                    <td th:text="${#temporals.format(pret.dateFinPret, 'dd/MM/yyyy')}">Date retour</td>
+                    <td th:text="${#temporals.format(pret.dateDebut, 'dd/MM/yyyy')}">Date prêt</td>
+                    <td th:text="${#temporals.format(pret.dateFin, 'dd/MM/yyyy')}">Date retour</td>
                 </tr>
             </tbody>
         </table>
