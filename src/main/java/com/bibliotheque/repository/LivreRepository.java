@@ -26,4 +26,7 @@ public interface LivreRepository extends JpaRepository<Livre, Long> {
     
     @Query("SELECT DISTINCT l FROM Livre l LEFT JOIN FETCH l.exemplaires")
     List<Livre> findAllWithExemplaires();
+
+    @Query("SELECT l FROM Livre l LEFT JOIN FETCH l.exemplaires WHERE l.idLivre = :id")
+    Optional<Livre> findByIdWithExemplaires(Long id);
 } 

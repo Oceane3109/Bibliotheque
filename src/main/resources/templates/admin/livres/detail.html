@@ -15,12 +15,14 @@
             <p><strong>Éditeur :</strong> <span th:text="${livre.editeur}">Éditeur</span></p>
             <p><strong>ISBN :</strong> <span th:text="${livre.isbn}">ISBN</span></p>
             <p><strong>Année de publication :</strong> <span th:text="${livre.anneePublication}">Année</span></p>
+            <!--
             <p>
                 <strong>Nombre d'exemplaires :</strong>
-                <span th:text="${#lists.size(livre.exemplaires)}"></span><br>
+                <span th:text="${livre.exemplaires.size()}"></span><br>
                 <strong>Disponibles :</strong>
                 <span th:text="${livre.nombreExemplairesDisponibles}"></span>
             </p>
+            -->
             <ul>
                 <li th:each="ex : ${livre.exemplaires}">
                     <span th:text="${ex.codeExemplaire}"></span> -
