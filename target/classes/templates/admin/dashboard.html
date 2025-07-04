@@ -240,6 +240,44 @@
             </div>
         </div>
 
+        <!-- Statistiques de notes -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Répartition des notes</h5>
+                        <canvas id="notesChart" width="400" height="200"></canvas>
+                        <div class="mt-2">
+                            <span th:text="${totalAvis}"></span> avis au total
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Top livres les mieux notés</h5>
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Livre</th>
+                                    <th>Moyenne</th>
+                                    <th>Nb avis</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="row : ${topLivres}">
+                                    <td th:text="${row[0].titre}"></td>
+                                    <td th:text="${#numbers.formatDecimal(row[1], 1, 2)}"></td>
+                                    <td th:text="${row[2]}"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Préparation pour listes avec actions -->
         <div class="row">
             <div class="col-md-12">
@@ -342,6 +380,30 @@
                     } : {}
                 }
             });
+        });
+
+        const ctxNotes = document.getElementById('notesChart').getContext('2d');
+        const notesChart = new Chart(ctxNotes, {
+            type: 'bar',
+            data: {
+                labels: ['5 étoiles', '4 étoiles', '3 étoiles', '2 étoiles', '1 étoile'],
+                datasets: [{
+                    label: 'Nombre de notes',
+                    data: [/*[[${nbNotes5}]], [[${nbNotes4}]], [[${nbNotes3}]], [[${nbNotes2}]], [[${nbNotes1}]]*/],
+                    backgroundColor: [
+                        '#f7c948', '#b0c4de', '#90caf9', '#ffe082', '#e57373'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
         });
     </script>
 </body>

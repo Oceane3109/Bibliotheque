@@ -3,13 +3,16 @@
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/service/impl/ExemplaireServiceImpl.java
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/repository/AdherentRepository.java
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/config/CustomAuthenticationSuccessHandler.java
+/Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/model/NoteLivre.java
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/service/TypeAdherentService.java
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/controller/UserPenaliseController.java
+/Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/service/impl/NoteLivreServiceImpl.java
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/repository/PretLivreRepository.java
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/model/ProlongementPret.java
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/controller/AdherentController.java
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/controller/AdminPretController.java
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/service/impl/JourFerieServiceImpl.java
+/Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/repository/NoteLivreRepository.java
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/controller/AdminDashboardController.java
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/model/Exemplaire.java
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/model/Penalite.java
@@ -51,6 +54,7 @@
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/service/PretLivreService.java
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/repository/JourFerieRepository.java
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/model/User.java
+/Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/controller/AdherentLivreController.java
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/service/JourFerieService.java
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/service/impl/UserServiceImpl.java
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/model/Notification.java
@@ -70,8 +74,10 @@
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/controller/ProlongementPretController.java
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/service/UserService.java
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/service/AdherentService.java
+/Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/controller/NoteLivreController.java
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/controller/RetourLivreController.java
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/repository/ReservationRepository.java
+/Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/service/NoteLivreService.java
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/service/TypePretService.java
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/service/PenaliteService.java
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/controller/HomeController.java

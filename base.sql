@@ -144,3 +144,14 @@ CREATE TABLE notifications (
     date_envoi TIMESTAMP NOT NULL,
     lu BOOLEAN NOT NULL DEFAULT FALSE
 );
+
+-- Table des notes des livres
+CREATE TABLE notes_livres (
+    id SERIAL PRIMARY KEY,
+    livre_id BIGINT NOT NULL REFERENCES livres(id_livre) ON DELETE CASCADE,
+    adherent_id BIGINT NOT NULL REFERENCES adherents(id_adherent) ON DELETE CASCADE,
+    note INTEGER NOT NULL CHECK (note >= 1 AND note <= 5),
+    commentaire VARCHAR(500),
+    date TIMESTAMP NOT NULL,
+    CONSTRAINT unique_livre_adherent UNIQUE (livre_id, adherent_id)
+);
