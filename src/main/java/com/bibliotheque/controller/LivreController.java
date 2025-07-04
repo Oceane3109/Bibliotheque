@@ -202,7 +202,7 @@ public class LivreController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin/list")
     public String adminListLivres(Model model) {
-        model.addAttribute("livres", livreService.getAllLivres());
+        model.addAttribute("livres", livreService.getAllLivresWithExemplaires());
         return "admin/livres/list";
     }
 } 
