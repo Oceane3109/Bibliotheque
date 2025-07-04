@@ -43,6 +43,7 @@
                                 <th>Auteur</th>
                                 <th>ISBN</th>
                                 <th>Année</th>
+                                <th>Exemplaires</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -64,6 +65,12 @@
                                 <td th:text="${livre.auteur}">Auteur</td>
                                 <td th:text="${livre.isbn}">ISBN</td>
                                 <td th:text="${livre.anneePublication}">Année</td>
+                                <td>
+                                    <span th:text="${#lists.size(livre.exemplaires)}"></span>
+                                    <ul class="mb-0 ps-3" style="font-size: 0.9em;">
+                                        <li th:each="ex : ${livre.exemplaires}" th:text="${ex.codeExemplaire} + ' (' + ex.etat + ')'"/>
+                                    </ul>
+                                </td>
                                 <td>
                                     <div class="btn-group" role="group">
                                         <a th:href="@{/admin/livres/{id}(id=${livre.idLivre})}" 
