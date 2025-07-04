@@ -128,4 +128,9 @@ public class LivreServiceImpl implements LivreService {
             .map(Livre::getImageDonnees)
             .orElseThrow(() -> new EntityNotFoundException("Livre non trouvé avec l'ID: " + livreId));
     }
+
+    @Override
+    public Optional<Livre> getLivreWithExemplairesById(Long id) {
+        return livreRepository.findByIdWithExemplaires(id);
+    }
 } 
