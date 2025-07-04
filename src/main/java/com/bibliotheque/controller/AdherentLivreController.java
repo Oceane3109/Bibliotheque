@@ -53,6 +53,7 @@ public class AdherentLivreController {
         model.addAttribute("moyenneNote", moyenneNote);
         model.addAttribute("avis", avis);
         model.addAttribute("noteDejaDonnee", noteDejaDonnee);
+        model.addAttribute("adherent", adherent);
         return "adherent/detail-livre";
     }
 } 

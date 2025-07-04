@@ -15,4 +15,5 @@ public interface NoteLivreService {
     List<Object[]> getTopLivresByNote();
     Long countByNote(int note);
     Long countAllNotes();
+    List<Object[]> getLastAvisWithDetails();
 } 

@@ -3,9 +3,15 @@ package com.bibliotheque.controller;
 import com.bibliotheque.model.Reservation;
 import com.bibliotheque.model.Adherent;
 import com.bibliotheque.model.Livre;
+import com.bibliotheque.model.PretLivre;
+import com.bibliotheque.model.Exemplaire;
+import com.bibliotheque.model.TypePret;
 import com.bibliotheque.service.ReservationService;
 import com.bibliotheque.service.AdherentService;
 import com.bibliotheque.service.LivreService;
+import com.bibliotheque.service.PretLivreService;
+import com.bibliotheque.service.ExemplaireService;
+import com.bibliotheque.service.TypePretService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,12 +31,18 @@ public class ReservationController {
     private final ReservationService reservationService;
     private final AdherentService adherentService;
     private final LivreService livreService;
+    private final PretLivreService pretLivreService;
+    private final ExemplaireService exemplaireService;
+    private final TypePretService typePretService;
 
     @Autowired
-    public ReservationController(ReservationService reservationService, AdherentService adherentService, LivreService livreService) {
+    public ReservationController(ReservationService reservationService, AdherentService adherentService, LivreService livreService, PretLivreService pretLivreService, ExemplaireService exemplaireService, TypePretService typePretService) {
         this.reservationService = reservationService;
         this.adherentService = adherentService;
         this.livreService = livreService;
+        this.pretLivreService = pretLivreService;
+        this.exemplaireService = exemplaireService;
+        this.typePretService = typePretService;
     }
 
     @GetMapping
@@ -96,6 +108,41 @@ public class ReservationController {
     public String deleteReservation(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         reservationService.deleteReservation(id);
         redirectAttributes.addFlashAttribute("success", "Réservation supprimée avec succès");
+        return "redirect:/admin/reservations";
+    }
+
+    @PostMapping("/confirm/{id}")
+    public String confirmerReservation(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        Optional<Reservation> reservationOpt = reservationService.getReservationById(id);
+        if (reservationOpt.isPresent()) {
+            Reservation reservation = reservationOpt.get();
+            reservation.setEtatReservation("confirmee");
+            reservationService.saveReservation(reservation);
+            // Création automatique du prêt
+            List<Exemplaire> exemplairesDispos = exemplaireService.getExemplairesDisponiblesByLivre(reservation.getLivre());
+            if (!exemplairesDispos.isEmpty()) {
+                Exemplaire exemplaire = exemplairesDispos.get(0);
+                List<TypePret> typesPret = typePretService.getAllTypePrets();
+                TypePret typePret = typesPret.isEmpty() ? null : typesPret.get(0);
+                if (typePret != null) {
+                    PretLivre pret = new PretLivre();
+                    pret.setAdherent(reservation.getAdherent());
+                    pret.setExemplaire(exemplaire);
+                    pret.setTypePret(typePret);
+                    pret.setDateDebut(reservation.getDatePret());
+                    pret.setDateFin(reservation.getDateFinPret());
+                    pret.setEtatPret("actif");
+                    pretLivreService.savePret(pret);
+                    exemplaire.setEtat("en_pret");
+                    exemplaireService.saveExemplaire(exemplaire);
+                    redirectAttributes.addFlashAttribute("success", "Réservation confirmée et prêt créé avec succès");
+                } else {
+                    redirectAttributes.addFlashAttribute("error", "Aucun type de prêt disponible pour créer le prêt.");
+                }
+            } else {
+                redirectAttributes.addFlashAttribute("error", "Aucun exemplaire disponible pour ce livre.");
+            }
+        }
         return "redirect:/admin/reservations";
     }
 }

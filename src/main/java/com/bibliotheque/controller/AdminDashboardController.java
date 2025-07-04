@@ -56,6 +56,7 @@ public class AdminDashboardController {
         model.addAttribute("nbNotes1", noteLivreService.countByNote(1));
         // Top livres
         model.addAttribute("topLivres", noteLivreService.getTopLivresByNote());
+        model.addAttribute("lastAvis", noteLivreService.getLastAvisWithDetails());
         return "admin/dashboard";
     }
 } 

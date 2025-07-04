@@ -44,14 +44,14 @@
                     <td th:text="${retour.pretLivre.adherent.nom + ' ' + retour.pretLivre.adherent.prenom}">Adhérent</td>
                     <td th:text="${retour.pretLivre.exemplaire.livre.titre}">Livre</td>
                     <td th:text="${retour.pretLivre.exemplaire.codeExemplaire}">Exemplaire</td>
-                    <td th:text="${#temporals.format(retour.pretLivre.datePret, 'dd/MM/yyyy')}">Date prêt</td>
+                    <td th:text="${#temporals.format(retour.pretLivre.dateDebut, 'dd/MM/yyyy')}">Date prêt</td>
                     <td th:text="${#temporals.format(retour.dateRetour, 'dd/MM/yyyy')}">Date retour</td>
                     <td>
                         <span th:class="${'badge ' + 
-                            (retour.etatRetourLivre == 'bon' ? 'bg-success' : 
-                             retour.etatRetourLivre == 'endommage' ? 'bg-warning' :
-                             retour.etatRetourLivre == 'perdu' ? 'bg-danger' : 'bg-secondary')}"
-                              th:text="${retour.etatRetourLivre}">État</span>
+                            (retour.etatRetour == 'bon' ? 'bg-success' : 
+                             retour.etatRetour == 'endommage' ? 'bg-warning' :
+                             retour.etatRetour == 'perdu' ? 'bg-danger' : 'bg-secondary')}"
+                              th:text="${retour.etatRetour}">État</span>
                     </td>
                     <td>
                         <a th:href="@{/admin/retours/edit/{id}(id=${retour.idRetour})}" class="btn btn-warning btn-sm me-2">
