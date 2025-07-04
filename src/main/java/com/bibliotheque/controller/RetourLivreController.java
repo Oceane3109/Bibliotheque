@@ -90,4 +90,18 @@ public class RetourLivreController {
         redirectAttributes.addFlashAttribute("success", "Retour supprimé avec succès");
         return "redirect:/admin/retours";
     }
+
+    @GetMapping("/create/{pretId}")
+    public String showCreateFormFromPret(@PathVariable Long pretId, Model model) {
+        var pretOpt = pretLivreService.getPretById(pretId);
+        if (pretOpt.isEmpty()) {
+            return "redirect:/admin/prets/list";
+        }
+        RetourLivre retour = new RetourLivre();
+        retour.setPretLivre(pretOpt.get());
+        retour.setDateRetour(java.time.LocalDate.now());
+        model.addAttribute("retourLivre", retour);
+        model.addAttribute("prets", pretLivreService.getAllPrets());
+        return "admin/retours/form";
+    }
 } 

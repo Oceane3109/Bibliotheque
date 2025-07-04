@@ -30,38 +30,10 @@ public class NotificationController {
         this.adherentService = adherentService;
     }
 
-
-
     @PostMapping("/notification/lue/{id}")
     public String marquerCommeLue(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         notificationService.marquerCommeLue(id);
         redirectAttributes.addFlashAttribute("success", "Notification marquée comme lue.");
         return "redirect:/adherent/mes-notifications";
-    }
-
-    @GetMapping("/admin/notifications/create")
-    public String showCreateForm(Model model) {
-        model.addAttribute("notification", new Notification());
-        model.addAttribute("adherents", adherentService.getAllAdherents());
-        return "admin/notifications/form";
-    }
-
-    @PostMapping("/admin/notifications/create")
-    public String createNotification(@ModelAttribute Notification notification, @RequestParam(value = "adherentIds", required = false) List<Long> adherentIds, RedirectAttributes redirectAttributes) {
-        if (adherentIds != null && !adherentIds.isEmpty()) {
-            for (Long id : adherentIds) {
-                adherentService.getAdherentById(id).ifPresent(adherent -> {
-                    Notification notif = new Notification();
-                    notif.setAdherent(adherent);
-                    notif.setTitre(notification.getTitre());
-                    notif.setMessage(notification.getMessage());
-                    notif.setDateEnvoi(java.time.LocalDateTime.now());
-                    notif.setLu(false);
-                    notificationService.saveNotification(notif);
-                });
-            }
-        }
-        redirectAttributes.addFlashAttribute("success", "Notification(s) envoyée(s) avec succès");
-        return "redirect:/admin/notifications/create";
     }
 } 
