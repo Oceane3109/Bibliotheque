@@ -26,7 +26,7 @@ public class AdminLivreController {
 
     @GetMapping("/list")
     public String listLivres(Model model) {
-        List<Livre> livres = livreService.getAllLivres();
+        List<Livre> livres = livreService.getAllLivresWithExemplaires();
         model.addAttribute("livres", livres);
         return "admin/livres/list";
     }
