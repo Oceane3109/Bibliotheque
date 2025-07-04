@@ -37,7 +37,19 @@ public class AdherentProfileController {
         
         Adherent adherent = adherentOpt.get();
         
+        // Vérifier si l'adhérent est pénalisé
+        boolean isPenalise = adherentService.isPenalise(adherent.getIdAdherent());
+        adherent.setPenalise(isPenalise);
+        
+        // Calculer les pourcentages pour les barres de progression
+        double pourcentageDomicile = adherent.getMaxLivresDomicile() > 0 ? 
+            (double) adherent.getLivresEmpruntesDomicile() / adherent.getMaxLivresDomicile() * 100 : 0;
+        double pourcentageSurplace = adherent.getMaxLivresSurplace() > 0 ? 
+            (double) adherent.getLivresEmpruntesSurplace() / adherent.getMaxLivresSurplace() * 100 : 0;
+        
         model.addAttribute("adherent", adherent);
+        model.addAttribute("pourcentageDomicile", pourcentageDomicile);
+        model.addAttribute("pourcentageSurplace", pourcentageSurplace);
         model.addAttribute("notificationsNonLuesCount", 
                           notificationService.getNotificationsNonLuesByAdherent(adherent).size());
         

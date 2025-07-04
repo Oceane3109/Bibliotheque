@@ -76,7 +76,7 @@
                                 <h6>Emprunts à domicile</h6>
                                 <div class="progress mb-2">
                                     <div class="progress-bar" 
-                                         th:style="'width: ' + ${(adherent.livresEmpruntesDomicile / adherent.maxLivresDomicile) * 100} + '%'"
+                                         th:style="'width: ' + ${pourcentageDomicile} + '%'"
                                          th:text="${adherent.livresEmpruntesDomicile + '/' + adherent.maxLivresDomicile}">
                                         0/0
                                     </div>
@@ -86,10 +86,21 @@
                                 <h6>Emprunts sur place</h6>
                                 <div class="progress mb-2">
                                     <div class="progress-bar bg-success" 
-                                         th:style="'width: ' + ${(adherent.livresEmpruntesSurplace / adherent.maxLivresSurplace) * 100} + '%'"
+                                         th:style="'width: ' + ${pourcentageSurplace} + '%'"
                                          th:text="${adherent.livresEmpruntesSurplace + '/' + adherent.maxLivresSurplace}">
                                         0/0
                                     </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <h6>Statut du compte</h6>
+                                <div class="d-flex align-items-center">
+                                    <span th:if="${adherent.penalise}" class="badge bg-danger me-2">
+                                        <i class="bi bi-exclamation-triangle"></i> Suspendu
+                                    </span>
+                                    <span th:unless="${adherent.penalise}" class="badge bg-success me-2">
+                                        <i class="bi bi-check-circle"></i> Actif
+                                    </span>
                                 </div>
                             </div>
                             <div class="text-center">

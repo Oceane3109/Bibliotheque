@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Mes statistiques</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="bi bi-graph-up"></i> Mes statistiques</h1>
+            <a th:href="@{/adherent/dashboard}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Retour au dashboard
+            </a>
+        </div>
+
+        <!-- Avertissement si l'adhérent est pénalisé -->
+        <div th:if="${adherent.penalise}" class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle"></i>
+            <strong>Attention :</strong> Votre compte est actuellement suspendu.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Statistiques générales -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-book text-primary" style="font-size: 2rem;"></i>
+                        <h4 class="mt-2" th:text="${#lists.size(pretsActifs)}">0</h4>
+                        <p class="text-muted">Prêts actifs</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-clock text-warning" style="font-size: 2rem;"></i>
+                        <h4 class="mt-2" th:text="${#lists.size(pretsEnRetard)}">0</h4>
+                        <p class="text-muted">Prêts en retard</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-bookmark text-info" style="font-size: 2rem;"></i>
+                        <h4 class="mt-2" th:text="${#lists.size(reservationsEnAttente)}">0</h4>
+                        <p class="text-muted">Réservations en attente</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-check-circle text-success" style="font-size: 2rem;"></i>
+                        <h4 class="mt-2" th:text="${#lists.size(pretsTermines)}">0</h4>
+                        <p class="text-muted">Prêts terminés</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Limites d'emprunt -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-house"></i> Emprunts à domicile</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Utilisation</span>
+                            <span th:text="${adherent.livresEmpruntesDomicile + '/' + adherent.maxLivresDomicile}">0/0</span>
+                        </div>
+                        <div class="progress mb-3">
+                            <div class="progress-bar" 
+                                 th:style="'width: ' + ${pourcentageDomicile} + '%'"
+                                 th:text="${#numbers.formatDecimal(pourcentageDomicile, 1, 1)} + '%'">
+                                0%
+                            </div>
+                        </div>
+                        <small class="text-muted">
+                            <span th:if="${adherent.livresEmpruntesDomicile < adherent.maxLivresDomicile}">
+                                Vous pouvez encore emprunter <span th:text="${adherent.maxLivresDomicile - adherent.livresEmpruntesDomicile}">0</span> livre(s)
+                            </span>
+                            <span th:unless="${adherent.livresEmpruntesDomicile < adherent.maxLivresDomicile}">
+                                Vous avez atteint votre limite d'emprunts à domicile
+                            </span>
+                        </small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-building"></i> Emprunts sur place</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Utilisation</span>
+                            <span th:text="${adherent.livresEmpruntesSurplace + '/' + adherent.maxLivresSurplace}">0/0</span>
+                        </div>
+                        <div class="progress mb-3">
+                            <div class="progress-bar bg-success" 
+                                 th:style="'width: ' + ${pourcentageSurplace} + '%'"
+                                 th:text="${#numbers.formatDecimal(pourcentageSurplace, 1, 1)} + '%'">
+                                0%
+                            </div>
+                        </div>
+                        <small class="text-muted">
+                            <span th:if="${adherent.livresEmpruntesSurplace < adherent.maxLivresSurplace}">
+                                Vous pouvez encore emprunter <span th:text="${adherent.maxLivresSurplace - adherent.livresEmpruntesSurplace}">0</span> livre(s)
+                            </span>
+                            <span th:unless="${adherent.livresEmpruntesSurplace < adherent.maxLivresSurplace}">
+                                Vous avez atteint votre limite d'emprunts sur place
+                            </span>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistiques temporelles -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-calendar-month"></i> Activité ce mois</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <h3 class="text-primary" th:text="${pretsCeMois}">0</h3>
+                                <p class="text-muted">Nouveaux prêts</p>
+                            </div>
+                            <div class="col-6">
+                                <h3 class="text-info" th:text="${#lists.size(reservationsEnAttente)}">0</h3>
+                                <p class="text-muted">Réservations actives</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-calendar-year"></i> Activité cette année</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <h3 class="text-success" th:text="${pretsCetteAnnee}">0</h3>
+                                <p class="text-muted">Prêts effectués</p>
+                            </div>
+                            <div class="col-6">
+                                <h3 class="text-warning" th:text="${#lists.size(pretsTermines)}">0</h3>
+                                <p class="text-muted">Prêts terminés</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Détails des prêts actifs -->
+        <div th:if="${!#lists.isEmpty(pretsActifs)}" class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-list-ul"></i> Prêts actuellement en cours</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Livre</th>
+                                <th>Date d'emprunt</th>
+                                <th>Date de retour</th>
+                                <th>Type</th>
+                                <th>État</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="pret : ${pretsActifs}">
+                                <td>
+                                    <strong th:text="${pret.exemplaire.livre.titre}">Titre</strong><br>
+                                    <small class="text-muted" th:text="${pret.exemplaire.livre.auteur}">Auteur</small>
+                                </td>
+                                <td th:text="${#temporals.format(pret.dateDebut, 'dd/MM/yyyy')}">Date</td>
+                                <td th:text="${#temporals.format(pret.dateFin, 'dd/MM/yyyy')}">Date</td>
+                                <td>
+                                    <span class="badge bg-primary" th:text="${pret.typePret.nomTypePret}">Type</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-success" th:text="${pret.etatPret}">État</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions rapides -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Actions rapides</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <a th:href="@{/adherent/catalogue}" class="btn btn-outline-primary w-100 mb-2">
+                            <i class="bi bi-search"></i> Parcourir le catalogue
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a th:href="@{/adherent/mes-prets}" class="btn btn-outline-info w-100 mb-2">
+                            <i class="bi bi-list"></i> Mes prêts
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a th:href="@{/adherent/mes-reservations}" class="btn btn-outline-warning w-100 mb-2">
+                            <i class="bi bi-bookmark"></i> Mes réservations
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a th:href="@{/adherent/profile}" class="btn btn-outline-secondary w-100 mb-2">
+                            <i class="bi bi-person"></i> Mon profil
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 
