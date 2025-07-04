@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des notifications - Administration</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="bi bi-bell"></i> Liste des notifications</h1>
+            <a href="/admin/notifications/create" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Créer une notification
+            </a>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Notifications enregistrées</h5>
+            </div>
+            <div class="card-body">
+                <div th:if="${#lists.isEmpty(notifications)}" class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> Aucune notification enregistrée pour le moment.
+                </div>
+
+                <div th:if="${!#lists.isEmpty(notifications)}" class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Adhérent</th>
+                                <th>Titre</th>
+                                <th>Message</th>
+                                <th>Date</th>
+                                <th>État</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="notification : ${notifications}">
+                                <td th:text="${notification.adherent.nom + ' ' + notification.adherent.prenom}">Adhérent</td>
+                                <td th:text="${notification.titre}">Titre</td>
+                                <td th:text="${notification.message}">Message</td>
+                                <td th:text="${#temporals.format(notification.dateEnvoi, 'dd/MM/yyyy HH:mm')}">Date</td>
+                                <td>
+                                    <span th:if="${notification.lu}" class="badge bg-secondary">Lue</span>
+                                    <span th:unless="${notification.lu}" class="badge bg-primary">Non lue</span>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a th:href="@{/admin/notifications/edit/{id}(id=${notification.idNotification})}" 
+                                           class="btn btn-sm btn-outline-warning" 
+                                           title="Modifier">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a th:href="@{/admin/notifications/delete/{id}(id=${notification.idNotification})}" 
+                                           class="btn btn-sm btn-outline-danger" 
+                                           title="Supprimer"
+                                           onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette notification ?');">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{shared/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Mon profil</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="container mt-4">
+            <h1><i class="bi bi-person-circle"></i> Mon profil</h1>
+            
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Informations personnelles</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-sm-4">
+                                    <strong>Nom :</strong>
+                                </div>
+                                <div class="col-sm-8" th:text="${adherent.nom}">Nom</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4">
+                                    <strong>Prénom :</strong>
+                                </div>
+                                <div class="col-sm-8" th:text="${adherent.prenom}">Prénom</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4">
+                                    <strong>Email :</strong>
+                                </div>
+                                <div class="col-sm-8" th:text="${adherent.email}">Email</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4">
+                                    <strong>Téléphone :</strong>
+                                </div>
+                                <div class="col-sm-8" th:text="${adherent.telephone}">Téléphone</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4">
+                                    <strong>Adresse :</strong>
+                                </div>
+                                <div class="col-sm-8" th:text="${adherent.adresse}">Adresse</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4">
+                                    <strong>Date d'inscription :</strong>
+                                </div>
+                                <div class="col-sm-8" th:text="${#temporals.format(adherent.dateInscription, 'dd/MM/yyyy')}">Date</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4">
+                                    <strong>Type d'adhérent :</strong>
+                                </div>
+                                <div class="col-sm-8" th:text="${adherent.typeAdherent?.nomType}">Type</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Statistiques</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <h6>Emprunts à domicile</h6>
+                                <div class="progress mb-2">
+                                    <div class="progress-bar" 
+                                         th:style="'width: ' + ${(adherent.livresEmpruntesDomicile / adherent.maxLivresDomicile) * 100} + '%'"
+                                         th:text="${adherent.livresEmpruntesDomicile + '/' + adherent.maxLivresDomicile}">
+                                        0/0
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <h6>Emprunts sur place</h6>
+                                <div class="progress mb-2">
+                                    <div class="progress-bar bg-success" 
+                                         th:style="'width: ' + ${(adherent.livresEmpruntesSurplace / adherent.maxLivresSurplace) * 100} + '%'"
+                                         th:text="${adherent.livresEmpruntesSurplace + '/' + adherent.maxLivresSurplace}">
+                                        0/0
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <a href="/adherent/profile/edit" class="btn btn-primary">
+                                    <i class="bi bi-pencil"></i> Modifier mon profil
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

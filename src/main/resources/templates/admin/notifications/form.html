@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Envoyer une notification</title>
+    <link rel="stylesheet" th:href="@{/css/auth.css}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+</head>
+<body>
+<div class="container mt-4">
+    <h2>Envoyer une notification</h2>
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <form th:action="@{/admin/notifications/create}" th:object="${notification}" method="post">
+        <div class="mb-3">
+            <label for="titre" class="form-label">Titre</label>
+            <input type="text" class="form-control" id="titre" th:field="*{titre}" maxlength="100" required />
+        </div>
+        <div class="mb-3">
+            <label for="message" class="form-label">Message</label>
+            <textarea class="form-control" id="message" th:field="*{message}" maxlength="500" rows="4" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Adhérents destinataires</label>
+            <select class="form-select" name="adherentIds" multiple required>
+                <option th:each="ad : ${adherents}" th:value="${ad.idAdherent}" th:text="${ad.nom + ' ' + ad.prenom}"></option>
+            </select>
+            <div class="form-text">Maintenez Ctrl (Windows) ou Cmd (Mac) pour sélectionner plusieurs adhérents.</div>
+        </div>
+        <button type="submit" class="btn btn-success">Envoyer</button>
+    </form>
+</div>
+</body>
+</html> 

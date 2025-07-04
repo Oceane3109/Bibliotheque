@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des jours fériés</title>
+    <link rel="stylesheet" th:href="@{/css/auth.css}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+</head>
+<body>
+<div class="container mt-4">
+    <h2>Liste des jours fériés</h2>
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <a th:href="@{/admin/jours-feries/create}" class="btn btn-primary mb-3">Nouveau jour férié</a>
+    <table class="table table-bordered table-hover">
+        <thead>
+        <tr>
+            <th>Date</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="jour : ${joursFeries}">
+            <td th:text="${#dates.format(jour.dateFeriee, 'dd/MM/yyyy')}"></td>
+            <td th:text="${jour.description}"></td>
+            <td>
+                <a th:href="@{'/admin/jours-feries/edit/' + ${jour.idJourFerie}}" class="btn btn-sm btn-warning">Modifier</a>
+                <form th:action="@{'/admin/jours-feries/delete/' + ${jour.idJourFerie}}" method="post" style="display:inline-block;">
+                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Supprimer ce jour férié ?');">Supprimer</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html> 

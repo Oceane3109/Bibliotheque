@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${exemplaire.idExemplaire == null ? 'Ajouter un exemplaire' : 'Modifier un exemplaire'}">Exemplaire</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="row mb-4">
+            <div class="col">
+                <h1 th:text="${exemplaire.idExemplaire == null ? 'Ajouter un exemplaire' : 'Modifier un exemplaire'}">Exemplaire</h1>
+            </div>
+            <div class="col text-end">
+                <a th:href="@{/admin/exemplaires/livre/{id}(id=${livre.idLivre})}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Retour à la liste
+                </a>
+            </div>
+        </div>
+
+        <!-- Messages de succès/erreur -->
+        <div th:if="${success}" class="alert alert-success" role="alert">
+            <i class="bi bi-check-circle"></i> <span th:text="${success}">Success</span>
+        </div>
+        <div th:if="${error}" class="alert alert-danger" role="alert">
+            <i class="bi bi-exclamation-triangle"></i> <span th:text="${error}">Error</span>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <form th:action="${exemplaire.idExemplaire == null ? '/admin/exemplaires/livre/' + livre.idLivre + '/create' : '/admin/exemplaires/edit/' + exemplaire.idExemplaire}"
+                      th:object="${exemplaire}" method="post">
+                    <div class="mb-3">
+                        <label for="codeExemplaire" class="form-label">Code exemplaire*</label>
+                        <input type="text" class="form-control" id="codeExemplaire" th:field="*{codeExemplaire}" required maxlength="20">
+                        <div class="text-danger" th:if="${#fields.hasErrors('codeExemplaire')}" th:errors="*{codeExemplaire}"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="etat" class="form-label">État*</label>
+                        <select class="form-select" id="etat" th:field="*{etat}" required>
+                            <option value="">-- Sélectionner --</option>
+                            <option value="disponible">Disponible</option>
+                            <option value="emprunte">Emprunté</option>
+                            <option value="perdu">Perdu</option>
+                            <option value="endommage">Endommagé</option>
+                        </select>
+                        <div class="text-danger" th:if="${#fields.hasErrors('etat')}" th:errors="*{etat}"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="dateAcquisition" class="form-label">Date d'acquisition</label>
+                        <input type="date" class="form-control" id="dateAcquisition" th:field="*{dateAcquisition}">
+                        <div class="text-danger" th:if="${#fields.hasErrors('dateAcquisition')}" th:errors="*{dateAcquisition}"></div>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> <span th:text="${exemplaire.idExemplaire == null ? 'Ajouter' : 'Enregistrer'}">Submit</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des prêts - Administration</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1><i class="bi bi-book"></i> Liste des prêts</h1>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Prêts enregistrés</h5>
+            </div>
+            <div class="card-body">
+                <div th:if="${#lists.isEmpty(prets)}" class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> Aucun prêt enregistré pour le moment.
+                </div>
+
+                <div th:if="${!#lists.isEmpty(prets)}" class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Adhérent</th>
+                                <th>Livre</th>
+                                <th>Exemplaire</th>
+                                <th>Date de prêt</th>
+                                <th>Date de retour</th>
+                                <th>État</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="pret : ${prets}">
+                                <td th:text="${pret.adherent.nom + ' ' + pret.adherent.prenom}">Adhérent</td>
+                                <td th:text="${pret.exemplaire.livre.titre}">Livre</td>
+                                <td th:text="${pret.exemplaire.codeExemplaire}">Exemplaire</td>
+                                <td th:text="${#temporals.format(pret.dateDebut, 'dd/MM/yyyy')}">Date prêt</td>
+                                <td th:text="${#temporals.format(pret.dateFin, 'dd/MM/yyyy')}">Date retour</td>
+                                <td>
+                                    <span th:if="${pret.etatPret == 'actif'}" class="badge bg-success">Actif</span>
+                                    <span th:if="${pret.etatPret == 'retard'}" class="badge bg-danger">Retard</span>
+                                    <span th:if="${pret.etatPret == 'retourne'}" class="badge bg-secondary">Retourné</span>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a th:href="@{/admin/prets/edit/{id}(id=${pret.idPret})}" 
+                                           class="btn btn-sm btn-outline-warning" 
+                                           title="Modifier">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a th:href="@{/admin/retours/create/{id}(id=${pret.idPret})}" 
+                                           class="btn btn-sm btn-outline-success" 
+                                           title="Enregistrer retour">
+                                            <i class="bi bi-check-circle"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

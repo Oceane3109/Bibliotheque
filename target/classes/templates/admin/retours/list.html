@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Retours de livres</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="row mb-4">
+            <div class="col">
+                <h1>Retours de livres</h1>
+            </div>
+            <div class="col text-end">
+                <a href="/admin/retours/create" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Enregistrer un retour
+                </a>
+            </div>
+        </div>
+
+        <!-- Messages de succès/erreur -->
+        <div th:if="${success}" class="alert alert-success" role="alert">
+            <i class="bi bi-check-circle"></i> <span th:text="${success}">Success</span>
+        </div>
+        <div th:if="${error}" class="alert alert-danger" role="alert">
+            <i class="bi bi-exclamation-triangle"></i> <span th:text="${error}">Error</span>
+        </div>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Adhérent</th>
+                    <th>Livre</th>
+                    <th>Exemplaire</th>
+                    <th>Date de prêt</th>
+                    <th>Date de retour</th>
+                    <th>État du livre</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="retour : ${retours}">
+                    <td th:text="${retour.pretLivre.adherent.nom + ' ' + retour.pretLivre.adherent.prenom}">Adhérent</td>
+                    <td th:text="${retour.pretLivre.exemplaire.livre.titre}">Livre</td>
+                    <td th:text="${retour.pretLivre.exemplaire.codeExemplaire}">Exemplaire</td>
+                    <td th:text="${#temporals.format(retour.pretLivre.datePret, 'dd/MM/yyyy')}">Date prêt</td>
+                    <td th:text="${#temporals.format(retour.dateRetour, 'dd/MM/yyyy')}">Date retour</td>
+                    <td>
+                        <span th:class="${'badge ' + 
+                            (retour.etatRetourLivre == 'bon' ? 'bg-success' : 
+                             retour.etatRetourLivre == 'endommage' ? 'bg-warning' :
+                             retour.etatRetourLivre == 'perdu' ? 'bg-danger' : 'bg-secondary')}"
+                              th:text="${retour.etatRetourLivre}">État</span>
+                    </td>
+                    <td>
+                        <a th:href="@{/admin/retours/edit/{id}(id=${retour.idRetour})}" class="btn btn-warning btn-sm me-2">
+                            <i class="bi bi-pencil"></i> Modifier
+                        </a>
+                        <form th:action="@{/admin/retours/delete/{id}(id=${retour.idRetour})}" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer ce retour ?');">
+                                <i class="bi bi-trash"></i> Supprimer
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div th:if="${#lists.isEmpty(retours)}" class="alert alert-info" role="alert">
+            <i class="bi bi-info-circle"></i> Aucun retour enregistré.
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

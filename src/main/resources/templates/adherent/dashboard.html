@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Adhérent Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { min-height: 100vh; }
+        .sidebar {
+            min-width: 220px;
+            max-width: 220px;
+            min-height: 100vh;
+            background: #343a40;
+            color: #fff;
+        }
+        .sidebar a {
+            color: #fff;
+            text-decoration: none;
+            display: block;
+            padding: 12px 20px;
+        }
+        .sidebar a.active, .sidebar a:hover {
+            background: #495057;
+        }
+        .sidebar .sidebar-header {
+            font-size: 1.3rem;
+            padding: 20px;
+            background: #23272b;
+            text-align: center;
+        }
+        @media (max-width: 768px) {
+            .sidebar { min-width: 100vw; max-width: 100vw; min-height: auto; }
+        }
+    </style>
+</head>
+<body class="d-flex">
+    <nav class="sidebar">
+        <div class="sidebar-header">Adhérent</div>
+        <a href="/adherent/dashboard" class="active">Dashboard</a>
+        <a href="/adherent/catalogue">Catalogue</a>
+        <a href="/adherent/mes-prets">Mes prêts</a>
+        <a href="/adherent/mes-reservations">Mes réservations</a>
+        <a href="/adherent/mes-prolongements">Mes prolongements</a>
+        <a href="/adherent/mes-notifications">Mes notifications</a>
+        <a href="/adherent/profile">Mon profil</a>
+        <form th:action="@{/logout}" method="post" style="display: inline;">
+            <button type="submit" class="btn btn-link text-white" style="width: 100%; text-align: left; border: none; background: none; padding: 12px 20px;">
+                Déconnexion
+            </button>
+        </form>
+    </nav>
+    <main class="flex-fill p-4">
+        <h1>Bienvenue sur votre espace adhérent</h1>
+        <p>Utilise le menu à gauche pour accéder à tes informations et services.</p>
+        
+        <!-- Actions rapides -->
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="bi bi-search" style="font-size: 2rem; color: #007bff;"></i>
+                        <h5 class="card-title mt-2">Parcourir le catalogue</h5>
+                        <p class="card-text">Découvrez tous les livres disponibles à la bibliothèque.</p>
+                        <a href="/adherent/catalogue" class="btn btn-primary">Voir le catalogue</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="bi bi-list" style="font-size: 2rem; color: #28a745;"></i>
+                        <h5 class="card-title mt-2">Mes prêts</h5>
+                        <p class="card-text">Consultez vos prêts en cours et leur date de retour.</p>
+                        <a href="/adherent/mes-prets" class="btn btn-success">Voir mes prêts</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="bi bi-bookmark" style="font-size: 2rem; color: #ffc107;"></i>
+                        <h5 class="card-title mt-2">Mes réservations</h5>
+                        <p class="card-text">Gérez vos réservations de livres.</p>
+                        <a href="/adherent/mes-reservations" class="btn btn-warning">Voir mes réservations</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html> 

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{shared/layout}">
+<head>
+    <title>Types d'adhérents - Bibliothèque</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="container">
+            <div class="header-actions">
+                <h1>Types d'adhérents</h1>
+                <a th:href="@{/admin/types-adherents/create}" class="btn btn-primary">
+                    Nouveau type d'adhérent
+                </a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom</th>
+                            <th>Description</th>
+                            <th>Nombre d'adhérents</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="type : ${types}">
+                            <td th:text="${type.idTypeAdherent}"></td>
+                            <td th:text="${type.nomType}"></td>
+                            <td th:text="${type.description}"></td>
+                            <td th:text="${type.adherents.size()}"></td>
+                            <td class="actions">
+                                <a th:href="@{/admin/types-adherents/edit/{id}(id=${type.idTypeAdherent})}"
+                                   class="btn btn-sm btn-primary">
+                                    Modifier
+                                </a>
+                                <form th:action="@{/admin/types-adherents/delete/{id}(id=${type.idTypeAdherent})}"
+                                      method="post"
+                                      style="display: inline;"
+                                      th:if="${type.adherents.isEmpty()}">
+                                    <button type="submit"
+                                            class="btn btn-sm btn-danger"
+                                            onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce type d\'adhérent ?')">
+                                        Supprimer
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <style>
+            .header-actions {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+            }
+
+            .table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 1rem;
+                background-color: transparent;
+            }
+
+            .table th,
+            .table td {
+                padding: 12px;
+                vertical-align: top;
+                border-top: 1px solid #dee2e6;
+            }
+
+            .table thead th {
+                vertical-align: bottom;
+                border-bottom: 2px solid #dee2e6;
+                background-color: #f8f9fa;
+            }
+
+            .table tbody tr:nth-of-type(odd) {
+                background-color: rgba(0, 0, 0, 0.05);
+            }
+
+            .table tbody tr:hover {
+                background-color: rgba(0, 0, 0, 0.075);
+            }
+
+            .actions {
+                display: flex;
+                gap: 5px;
+            }
+
+            .btn-sm {
+                padding: 5px 10px;
+                font-size: 14px;
+            }
+
+            .btn-danger {
+                background-color: #dc3545;
+                color: white;
+            }
+
+            .btn-danger:hover {
+                background-color: #c82333;
+            }
+
+            .table-responsive {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+        </style>
+    </div>
+</body>
+</html> 

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{shared/layout}">
+<head>
+    <title>Inscription Adhérent - Bibliothèque</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="container">
+            <div class="inscription-form">
+                <h1>Inscription Adhérent</h1>
+
+                <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+
+                <form th:action="@{/adherents/inscription}" 
+                      th:object="${adherent}" 
+                      method="post">
+
+                    <div class="form-group">
+                        <label for="nom">Nom</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="nom" 
+                               th:field="*{nom}" 
+                               required>
+                        <div class="error-message" 
+                             th:if="${#fields.hasErrors('nom')}" 
+                             th:errors="*{nom}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="prenom">Prénom</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="prenom" 
+                               th:field="*{prenom}" 
+                               required>
+                        <div class="error-message" 
+                             th:if="${#fields.hasErrors('prenom')}" 
+                             th:errors="*{prenom}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" 
+                               class="form-control" 
+                               id="email" 
+                               th:field="*{email}" 
+                               required>
+                        <div class="error-message" 
+                             th:if="${#fields.hasErrors('email')}" 
+                             th:errors="*{email}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="telephone">Téléphone</label>
+                        <input type="tel" 
+                               class="form-control" 
+                               id="telephone" 
+                               th:field="*{telephone}" 
+                               pattern="[0-9]{10}" 
+                               title="Le numéro doit contenir 10 chiffres">
+                        <div class="error-message" 
+                             th:if="${#fields.hasErrors('telephone')}" 
+                             th:errors="*{telephone}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="adresse">Adresse</label>
+                        <textarea class="form-control" 
+                                  id="adresse" 
+                                  th:field="*{adresse}" 
+                                  rows="3">
+                        </textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dateNaissance">Date de naissance</label>
+                        <input type="date" 
+                               class="form-control" 
+                               id="dateNaissance" 
+                               th:field="*{dateNaissance}" 
+                               required>
+                        <div class="error-message" 
+                             th:if="${#fields.hasErrors('dateNaissance')}" 
+                             th:errors="*{dateNaissance}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="typeAdherentId">Type d'adhérent</label>
+                        <select class="form-control" 
+                                id="typeAdherentId" 
+                                name="typeAdherentId" 
+                                required>
+                            <option value="">Sélectionnez un type</option>
+                            <option th:each="type : ${typesAdherents}"
+                                    th:value="${type.idTypeAdherent}"
+                                    th:text="${type.nomType}">
+                            </option>
+                        </select>
+                        <div class="error-message" 
+                             th:if="${#fields.hasErrors('typeAdherent')}" 
+                             th:errors="*{typeAdherent}">
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">S'inscrire</button>
+                        <a th:href="@{/}" class="btn btn-secondary">Annuler</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <style>
+            .inscription-form {
+                max-width: 600px;
+                margin: 40px auto;
+                padding: 20px;
+                background-color: #fff;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .inscription-form h1 {
+                text-align: center;
+                margin-bottom: 30px;
+                color: #333;
+            }
+
+            .form-group {
+                margin-bottom: 20px;
+            }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 5px;
+                color: #555;
+                font-weight: 500;
+            }
+
+            .form-control {
+                width: 100%;
+                padding: 8px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                font-size: 16px;
+            }
+
+            .form-control:focus {
+                border-color: #4a90e2;
+                outline: none;
+                box-shadow: 0 0 5px rgba(74, 144, 226, 0.3);
+            }
+
+            .error-message {
+                color: #dc3545;
+                font-size: 14px;
+                margin-top: 5px;
+            }
+
+            .alert {
+                padding: 12px;
+                margin-bottom: 20px;
+                border-radius: 4px;
+            }
+
+            .alert-danger {
+                background-color: #f8d7da;
+                border: 1px solid #f5c6cb;
+                color: #721c24;
+            }
+
+            .form-actions {
+                margin-top: 30px;
+                display: flex;
+                gap: 10px;
+            }
+
+            .btn {
+                padding: 10px 20px;
+                border-radius: 4px;
+                font-size: 16px;
+                cursor: pointer;
+                border: none;
+            }
+
+            .btn-primary {
+                background-color: #4a90e2;
+                color: white;
+            }
+
+            .btn-secondary {
+                background-color: #6c757d;
+                color: white;
+                text-decoration: none;
+            }
+
+            .btn-primary:hover {
+                background-color: #357abd;
+            }
+
+            .btn-secondary:hover {
+                background-color: #5a6268;
+            }
+
+            select.form-control {
+                appearance: none;
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+                background-repeat: no-repeat;
+                background-position: right 8px center;
+                background-size: 16px;
+                padding-right: 32px;
+            }
+        </style>
+    </div>
+</body>
+</html> 

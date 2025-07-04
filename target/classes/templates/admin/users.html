@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{shared/layout}">
+<head>
+    <title>Gestion des Utilisateurs - Bibliothèque</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="container">
+            <h1>Gestion des Utilisateurs</h1>
+            
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom d'utilisateur</th>
+                            <th>Email</th>
+                            <th>Date de création</th>
+                            <th>Admin</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="user : ${users}">
+                            <td th:text="${user.idUser}"></td>
+                            <td th:text="${user.nomUtilisateur}"></td>
+                            <td th:text="${user.email}"></td>
+                            <td th:text="${#temporals.format(user.dateCreation, 'dd/MM/yyyy')}"></td>
+                            <td>
+                                <span th:if="${user.estAdmin}" class="badge badge-success">Oui</span>
+                                <span th:unless="${user.estAdmin}" class="badge badge-secondary">Non</span>
+                            </td>
+                            <td>
+                                <button class="btn btn-danger btn-sm"
+                                        th:onclick="'deleteUser(' + ${user.idUser} + ')'">
+                                    Supprimer
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <script th:inline="javascript">
+            function deleteUser(userId) {
+                if (confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) {
+                    fetch(`/users/admin/delete/${userId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+                        }
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload();
+                        } else {
+                            alert('Erreur lors de la suppression');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erreur:', error);
+                        alert('Erreur lors de la suppression');
+                    });
+                }
+            }
+        </script>
+    </div>
+</body>
+</html> 

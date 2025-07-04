@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulaire Suspension d'Adhérent</title>
+    <link rel="stylesheet" th:href="@{/css/auth.css}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+</head>
+<body>
+<div class="container mt-4">
+    <h2 th:text="${userPenalise.idUserPenalise != null ? 'Modifier' : 'Créer'} + ' une suspension d\'adhérent'"></h2>
+    <form th:action="${userPenalise.idUserPenalise != null} ? @{'/admin/users-penalises/edit/' + ${userPenalise.idUserPenalise}} : @{/admin/users-penalises/create}" th:object="${userPenalise}" method="post">
+        <div class="mb-3">
+            <label for="adherent" class="form-label">Adhérent</label>
+            <select class="form-select" id="adherent" th:field="*{adherent}" required>
+                <option th:each="ad : ${adherents}" th:value="${ad}" th:text="${ad.nom + ' ' + ad.prenom}"></option>
+            </select>
+            <div class="text-danger" th:if="${#fields.hasErrors('adherent')}" th:errors="*{adherent}"></div>
+        </div>
+        <div class="mb-3">
+            <label for="dateDebut" class="form-label">Date début</label>
+            <input type="date" class="form-control" id="dateDebut" th:field="*{dateDebut}" required />
+            <div class="text-danger" th:if="${#fields.hasErrors('dateDebut')}" th:errors="*{dateDebut}"></div>
+        </div>
+        <div class="mb-3">
+            <label for="dateFin" class="form-label">Date fin</label>
+            <input type="date" class="form-control" id="dateFin" th:field="*{dateFin}" required />
+            <div class="text-danger" th:if="${#fields.hasErrors('dateFin')}" th:errors="*{dateFin}"></div>
+        </div>
+        <div class="mb-3">
+            <label for="motif" class="form-label">Motif</label>
+            <input type="text" class="form-control" id="motif" th:field="*{motif}" maxlength="100" />
+            <div class="text-danger" th:if="${#fields.hasErrors('motif')}" th:errors="*{motif}"></div>
+        </div>
+        <div class="mb-3">
+            <label for="actif" class="form-label">Actif</label>
+            <select class="form-select" id="actif" th:field="*{actif}" required>
+                <option th:value="true">Oui</option>
+                <option th:value="false">Non</option>
+            </select>
+            <div class="text-danger" th:if="${#fields.hasErrors('actif')}" th:errors="*{actif}"></div>
+        </div>
+        <button type="submit" class="btn btn-success">Enregistrer</button>
+        <a th:href="@{/admin/users-penalises}" class="btn btn-secondary">Annuler</a>
+    </form>
+</div>
+</body>
+</html> 

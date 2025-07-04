@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{shared/layout}">
+<head>
+    <title th:text="${typeAdherent.idTypeAdherent} ? 'Modifier le type d\'adhérent' : 'Nouveau type d\'adhérent'">Type d'adhérent</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="container">
+            <h1 th:text="${typeAdherent.idTypeAdherent} ? 'Modifier le type d\'adhérent' : 'Nouveau type d\'adhérent'">Type d'adhérent</h1>
+            
+            <form th:action="@{${typeAdherent.idTypeAdherent} ? '/admin/types-adherents/edit/' + ${typeAdherent.idTypeAdherent} : '/admin/types-adherents/create'}"
+                  th:object="${typeAdherent}" 
+                  method="post" 
+                  class="form">
+                
+                <div class="form-group">
+                    <label for="nomType">Nom du type</label>
+                    <input type="text" 
+                           class="form-control" 
+                           id="nomType" 
+                           th:field="*{nomType}" 
+                           required>
+                    <div class="error-message" 
+                         th:if="${#fields.hasErrors('nomType')}" 
+                         th:errors="*{nomType}">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea class="form-control" 
+                              id="description" 
+                              th:field="*{description}" 
+                              rows="3">
+                    </textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <span th:text="${typeAdherent.idTypeAdherent} ? 'Modifier' : 'Créer'">Submit</span>
+                    </button>
+                    <a th:href="@{/admin/types-adherents}" class="btn btn-secondary">Annuler</a>
+                </div>
+            </form>
+        </div>
+
+        <style>
+            .form {
+                max-width: 600px;
+                margin: 20px auto;
+            }
+
+            .form-group {
+                margin-bottom: 20px;
+            }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 5px;
+                font-weight: 500;
+            }
+
+            .form-control {
+                width: 100%;
+                padding: 8px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                font-size: 16px;
+            }
+
+            .form-control:focus {
+                border-color: #4a90e2;
+                outline: none;
+                box-shadow: 0 0 5px rgba(74, 144, 226, 0.3);
+            }
+
+            textarea.form-control {
+                resize: vertical;
+                min-height: 100px;
+            }
+
+            .error-message {
+                color: #dc3545;
+                font-size: 14px;
+                margin-top: 5px;
+            }
+
+            .form-actions {
+                margin-top: 30px;
+                display: flex;
+                gap: 10px;
+            }
+
+            .btn {
+                padding: 10px 20px;
+                border-radius: 4px;
+                font-size: 16px;
+                cursor: pointer;
+                border: none;
+            }
+
+            .btn-primary {
+                background-color: #4a90e2;
+                color: white;
+            }
+
+            .btn-secondary {
+                background-color: #6c757d;
+                color: white;
+                text-decoration: none;
+            }
+
+            .btn-primary:hover {
+                background-color: #357abd;
+            }
+
+            .btn-secondary:hover {
+                background-color: #5a6268;
+            }
+        </style>
+    </div>
+</body>
+</html> 

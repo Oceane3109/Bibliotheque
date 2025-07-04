@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{shared/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des adhérents - Administration</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="container mt-4">
+            <h1><i class="bi bi-people"></i> Liste des adhérents</h1>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Adhérents enregistrés</h5>
+                </div>
+                <div class="card-body">
+                    <div th:if="${#lists.isEmpty(adherents)}" class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> Aucun adhérent enregistré pour le moment.
+                    </div>
+
+                    <div th:if="${!#lists.isEmpty(adherents)}" class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Prénom</th>
+                                    <th>Email</th>
+                                    <th>Téléphone</th>
+                                    <th>Type</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="adherent : ${adherents}">
+                                    <td th:text="${adherent.nom}">Nom</td>
+                                    <td th:text="${adherent.prenom}">Prénom</td>
+                                    <td th:text="${adherent.email}">Email</td>
+                                    <td th:text="${adherent.telephone}">Téléphone</td>
+                                    <td th:text="${adherent.typeAdherent?.nomType}">Type</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a th:href="@{/admin/adherents/edit/{id}(id=${adherent.idAdherent})}" 
+                                               class="btn btn-sm btn-outline-warning" 
+                                               title="Modifier">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a th:href="@{/admin/prets/adherent/{id}(id=${adherent.idAdherent})}" 
+                                               class="btn btn-sm btn-outline-info" 
+                                               title="Voir les prêts">
+                                                <i class="bi bi-book"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            .adherents-list {
+                margin: 40px auto;
+                padding: 20px;
+                background-color: #fff;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 30px;
+            }
+
+            .header h1 {
+                margin: 0;
+                color: #333;
+            }
+
+            .alert {
+                padding: 12px;
+                margin-bottom: 20px;
+                border-radius: 4px;
+            }
+
+            .alert-success {
+                background-color: #d4edda;
+                border: 1px solid #c3e6cb;
+                color: #155724;
+            }
+
+            .alert-danger {
+                background-color: #f8d7da;
+                border: 1px solid #f5c6cb;
+                color: #721c24;
+            }
+
+            .table {
+                width: 100%;
+                margin-bottom: 1rem;
+                background-color: transparent;
+                border-collapse: collapse;
+            }
+
+            .table th,
+            .table td {
+                padding: 12px;
+                vertical-align: middle;
+                border-top: 1px solid #dee2e6;
+            }
+
+            .table thead th {
+                vertical-align: bottom;
+                border-bottom: 2px solid #dee2e6;
+                background-color: #f8f9fa;
+                color: #495057;
+            }
+
+            .table tbody tr:nth-of-type(odd) {
+                background-color: rgba(0, 0, 0, 0.05);
+            }
+
+            .table-responsive {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .actions {
+                white-space: nowrap;
+            }
+
+            .actions .btn {
+                margin: 0 5px;
+            }
+
+            .btn-sm {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.875rem;
+                line-height: 1.5;
+                border-radius: 0.2rem;
+            }
+
+            .btn-primary {
+                color: #fff;
+                background-color: #4a90e2;
+                border: none;
+            }
+
+            .btn-danger {
+                color: #fff;
+                background-color: #dc3545;
+                border: none;
+            }
+
+            .btn-primary:hover {
+                background-color: #357abd;
+            }
+
+            .btn-danger:hover {
+                background-color: #c82333;
+            }
+
+            .btn[disabled] {
+                opacity: 0.65;
+                cursor: not-allowed;
+            }
+
+            .badge {
+                display: inline-block;
+                padding: 0.25em 0.4em;
+                font-size: 75%;
+                font-weight: 700;
+                line-height: 1;
+                text-align: center;
+                white-space: nowrap;
+                vertical-align: baseline;
+                border-radius: 0.25rem;
+                margin-left: 5px;
+            }
+
+            .badge-info {
+                color: #fff;
+                background-color: #17a2b8;
+            }
+
+            @media (max-width: 768px) {
+                .adherents-list {
+                    margin: 20px;
+                    padding: 15px;
+                }
+
+                .header {
+                    flex-direction: column;
+                    text-align: center;
+                }
+
+                .header h1 {
+                    margin-bottom: 15px;
+                }
+
+                .actions {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 5px;
+                }
+
+                .actions form {
+                    display: block !important;
+                }
+
+                .actions .btn {
+                    width: 100%;
+                    margin: 2px 0;
+                }
+            }
+        </style>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 
