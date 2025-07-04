@@ -5,28 +5,94 @@
     <title>Admin Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { min-height: 100vh; }
+        body {
+            min-height: 100vh;
+            background: #f3eafe; /* violet très pâle */
+        }
         .sidebar {
             min-width: 220px;
             max-width: 220px;
             min-height: 100vh;
-            background: #343a40;
-            color: #fff;
+            background: #b39ddb; /* violet pastel pâle */
+            color: #4a148c;
         }
         .sidebar a {
-            color: #fff;
+            color: #4a148c;
             text-decoration: none;
             display: block;
             padding: 12px 20px;
+            transition: background 0.2s;
         }
         .sidebar a.active, .sidebar a:hover {
-            background: #495057;
+            background: #e6defa;
+            color: #7c4dff;
         }
         .sidebar .sidebar-header {
             font-size: 1.3rem;
             padding: 20px;
-            background: #23272b;
+            background: #a084e8;
             text-align: center;
+            letter-spacing: 2px;
+            color: #fff;
+        }
+        .card {
+            border: none;
+            border-radius: 1rem;
+            box-shadow: 0 2px 12px rgba(124,77,255,0.08);
+            background: #fff;
+        }
+        .card .card-body i {
+            margin-bottom: 8px;
+            display: block;
+        }
+        .card .card-body h4 {
+            font-weight: bold;
+            color: #a084e8;
+        }
+        .card .card-body p {
+            color: #a1887f;
+        }
+        .btn-primary {
+            background: #a084e8;
+            border: none;
+        }
+        .btn-primary:hover {
+            background: #b39ddb;
+            color: #4a148c;
+        }
+        .btn-success {
+            background: #e6defa;
+            border: none;
+            color: #7c4dff;
+        }
+        .btn-success:hover {
+            background: #b39ddb;
+            color: #4a148c;
+        }
+        .btn-warning {
+            background: #f3e5f5;
+            border: none;
+            color: #a084e8;
+        }
+        .btn-warning:hover {
+            background: #e6defa;
+            color: #7c4dff;
+        }
+        .btn-danger {
+            background: #e57373;
+            border: none;
+        }
+        .btn-danger:hover {
+            background: #c62828;
+        }
+        .btn-info {
+            background: #e1bee7;
+            border: none;
+            color: #7c4dff;
+        }
+        .btn-info:hover {
+            background: #b39ddb;
+            color: #4a148c;
         }
         @media (max-width: 768px) {
             .sidebar { min-width: 100vw; max-width: 100vw; min-height: auto; }
@@ -51,6 +117,102 @@
     <main class="flex-fill p-4">
         <h1>Bienvenue sur le dashboard administrateur</h1>
         <p>Utilise le menu à gauche pour naviguer dans les différentes sections.</p>
+
+        <!-- Résumé d'activité -->
+        <div class="row mb-4">
+            <div class="col-md-2">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-book" style="font-size: 2rem; color: #007bff;"></i>
+                        <h4 th:text="${totalLivres}">0</h4>
+                        <p class="text-muted">Livres</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-people" style="font-size: 2rem; color: #28a745;"></i>
+                        <h4 th:text="${totalAdherents}">0</h4>
+                        <p class="text-muted">Adhérents</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-list" style="font-size: 2rem; color: #ffc107;"></i>
+                        <h4 th:text="${totalPretsActifs}">0</h4>
+                        <p class="text-muted">Prêts actifs</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-bookmark" style="font-size: 2rem; color: #17a2b8;"></i>
+                        <h4 th:text="${totalReservations}">0</h4>
+                        <p class="text-muted">Réservations</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-exclamation-triangle" style="font-size: 2rem; color: #dc3545;"></i>
+                        <h4 th:text="${totalPenalites}">0</h4>
+                        <p class="text-muted">Pénalités</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-bell" style="font-size: 2rem; color: #6f42c1;"></i>
+                        <h4 th:text="${totalNotifications}">0</h4>
+                        <p class="text-muted">Notifications</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions rapides -->
+        <div class="row mb-4">
+            <div class="col-md-2">
+                <a href="/admin/livres/form" class="btn btn-primary w-100 mb-2">
+                    <i class="bi bi-plus-circle"></i> Ajouter un livre
+                </a>
+            </div>
+            <div class="col-md-2">
+                <a href="/admin/adherents/form" class="btn btn-success w-100 mb-2">
+                    <i class="bi bi-person-plus"></i> Ajouter un adhérent
+                </a>
+            </div>
+            <div class="col-md-2">
+                <a href="/admin/prets/form" class="btn btn-warning w-100 mb-2">
+                    <i class="bi bi-arrow-right-circle"></i> Nouveau prêt
+                </a>
+            </div>
+            <div class="col-md-2">
+                <a href="/admin/penalites/form" class="btn btn-danger w-100 mb-2">
+                    <i class="bi bi-exclamation-circle"></i> Nouvelle pénalité
+                </a>
+            </div>
+            <div class="col-md-2">
+                <a href="/admin/notifications/form" class="btn btn-info w-100 mb-2">
+                    <i class="bi bi-bell-plus"></i> Nouvelle notification
+                </a>
+            </div>
+        </div>
+
+        <!-- Préparation pour listes avec actions -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> Utilise le menu à gauche pour accéder aux listes détaillées (Livres, Adhérents, Prêts, etc.) et gérer chaque élément (voir, modifier, supprimer).
+                </div>
+            </div>
+        </div>
     </main>
 </body>
 </html> 

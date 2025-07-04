@@ -48,14 +48,14 @@
                         <div class="text-danger" th:if="${#fields.hasErrors('exemplaire')}" th:errors="*{exemplaire}"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="datePret" class="form-label">Date de prêt*</label>
-                        <input type="date" class="form-control" id="datePret" th:field="*{datePret}" required>
-                        <div class="text-danger" th:if="${#fields.hasErrors('datePret')}" th:errors="*{datePret}"></div>
+                        <label for="dateDebut" class="form-label">Date de début*</label>
+                        <input type="date" class="form-control" id="dateDebut" th:field="*{dateDebut}" required>
+                        <div class="text-danger" th:if="${#fields.hasErrors('dateDebut')}" th:errors="*{dateDebut}"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="dateFinPret" class="form-label">Date de retour*</label>
-                        <input type="date" class="form-control" id="dateFinPret" th:field="*{dateFinPret}" required>
-                        <div class="text-danger" th:if="${#fields.hasErrors('dateFinPret')}" th:errors="*{dateFinPret}"></div>
+                        <label for="dateFin" class="form-label">Date de retour*</label>
+                        <input type="date" class="form-control" id="dateFin" th:field="*{dateFin}" required>
+                        <div class="text-danger" th:if="${#fields.hasErrors('dateFin')}" th:errors="*{dateFin}"></div>
                     </div>
                     <div class="mb-3">
                         <label for="typePret" class="form-label">Type de prêt*</label>

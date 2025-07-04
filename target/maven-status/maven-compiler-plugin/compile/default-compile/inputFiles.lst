@@ -79,6 +79,7 @@
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/model/RetourLivre.java
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/model/Reservation.java
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/model/UserPenalise.java
+/Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/controller/AdherentStatistiquesController.java
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/repository/ProlongementPretRepository.java
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/service/ExemplaireService.java
 /Users/oceanechristodoulou/Desktop/S4/Naina/Biblio/src/main/java/com/bibliotheque/BibliothequeApplication.java
