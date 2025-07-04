@@ -7,6 +7,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
@@ -28,5 +29,12 @@ public class AdminLivreController {
         List<Livre> livres = livreService.getAllLivres();
         model.addAttribute("livres", livres);
         return "admin/livres/list";
+    }
+
+    @GetMapping("/{id}")
+    public String detailLivreAdmin(@PathVariable Long id, Model model) {
+        Livre livre = livreService.getLivreById(id).orElseThrow();
+        model.addAttribute("livre", livre);
+        return "admin/livres/detail";
     }
 } 

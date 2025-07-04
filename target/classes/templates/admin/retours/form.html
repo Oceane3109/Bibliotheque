@@ -45,14 +45,14 @@
                         <div class="text-danger" th:if="${#fields.hasErrors('dateRetour')}" th:errors="*{dateRetour}"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="etatRetourLivre" class="form-label">État du livre*</label>
-                        <select class="form-select" id="etatRetourLivre" th:field="*{etatRetourLivre}" required>
+                        <label for="etatRetour" class="form-label">État du livre*</label>
+                        <select class="form-select" id="etatRetour" th:field="*{etatRetour}" required>
                             <option value="">-- Sélectionner --</option>
                             <option value="bon">Bon</option>
                             <option value="endommage">Endommagé</option>
                             <option value="perdu">Perdu</option>
                         </select>
-                        <div class="text-danger" th:if="${#fields.hasErrors('etatRetourLivre')}" th:errors="*{etatRetourLivre}"></div>
+                        <div class="text-danger" th:if="${#fields.hasErrors('etatRetour')}" th:errors="*{etatRetour}"></div>
                     </div>
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary">

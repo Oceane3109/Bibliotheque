@@ -31,7 +31,7 @@ public class NoteLivreServiceImpl implements NoteLivreService {
 
     @Override
     public List<NoteLivre> getNotesByLivre(Livre livre) {
-        return noteLivreRepository.findByLivre(livre);
+        return noteLivreRepository.findByLivreWithAdherent(livre);
     }
 
     @Override
@@ -57,5 +57,10 @@ public class NoteLivreServiceImpl implements NoteLivreService {
     @Override
     public Long countAllNotes() {
         return noteLivreRepository.count();
+    }
+
+    @Override
+    public List<Object[]> getLastAvisWithDetails() {
+        return noteLivreRepository.findLastAvisWithDetails();
     }
 } 

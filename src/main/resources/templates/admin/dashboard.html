@@ -4,114 +4,30 @@
     <meta charset="UTF-8">
     <title>Admin Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            min-height: 100vh;
-            background: #f8f9fa; /* gris très clair */
-        }
-        .sidebar {
-            min-width: 220px;
-            max-width: 220px;
-            min-height: 100vh;
-            background: #14213d; /* navy blue */
-            color: #fff;
-            border-right: 2px solid #e0e0e0;
-            box-shadow: 2px 0 8px rgba(26,35,126,0.04);
-        }
-        .sidebar a {
-            color: #fff;
-            text-decoration: none;
-            display: block;
-            padding: 12px 20px;
-            transition: background 0.2s, color 0.2s;
-            border-radius: 0 2rem 2rem 0;
-        }
-        .sidebar a.active, .sidebar a:hover {
-            background: #1f2a48;
-            color: #fca311;
-        }
-        .sidebar .sidebar-header {
-            font-size: 1.3rem;
-            padding: 20px;
-            background: #1f2a48;
-            text-align: center;
-            letter-spacing: 2px;
-            color: #fca311;
-            font-weight: bold;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        .card {
-            border: none;
-            border-radius: 1rem;
-            box-shadow: 0 2px 12px rgba(26,35,126,0.06);
-            background: #fff;
-        }
-        .card .card-body i {
-            margin-bottom: 8px;
-            display: block;
-            color: #14213d;
-        }
-        .card .card-body h4 {
-            font-weight: bold;
-            color: #14213d;
-        }
-        .card .card-body p {
-            color: #757575;
-        }
-        .btn-primary {
-            background: #14213d;
-            border: none;
-            color: #fff;
-            box-shadow: 0 2px 8px rgba(21,101,192,0.08);
-        }
-        .btn-primary:hover {
-            background: #1f2a48;
-            color: #fca311;
-        }
-        .btn-success {
-            background: #e3eafc;
-            border: none;
-            color: #14213d;
-        }
-        .btn-success:hover {
-            background: #bbdefb;
-            color: #14213d;
-        }
-        .btn-warning {
-            background: #fff8e1;
-            border: none;
-            color: #bfa100;
-        }
-        .btn-warning:hover {
-            background: #ffe082;
-            color: #7c6f00;
-        }
-        .btn-danger {
-            background: #e57373;
-            border: none;
-        }
-        .btn-danger:hover {
-            background: #c62828;
-        }
-        .btn-info {
-            background: #e3f2fd;
-            border: none;
-            color: #14213d;
-        }
-        .btn-info:hover {
-            background: #bbdefb;
-            color: #14213d;
-        }
-        .alert-info {
-            background: #e3eafc;
-            color: #14213d;
-            border: none;
-        }
-        @media (max-width: 768px) {
-            .sidebar { min-width: 100vw; max-width: 100vw; min-height: auto; }
-        }
-    </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { min-height: 100vh; background: #f8f9fa; }
+        .sidebar { min-width: 220px; max-width: 220px; min-height: 100vh; background: #14213d; color: #fff; border-right: 2px solid #e0e0e0; box-shadow: 2px 0 8px rgba(26,35,126,0.04); }
+        .sidebar a { color: #fff; text-decoration: none; display: block; padding: 12px 20px; transition: background 0.2s, color 0.2s; border-radius: 0 2rem 2rem 0; }
+        .sidebar a.active, .sidebar a:hover { background: #1f2a48; color: #fca311; }
+        .sidebar .sidebar-header { font-size: 1.3rem; padding: 20px; background: #1f2a48; text-align: center; letter-spacing: 2px; color: #fca311; font-weight: bold; border-bottom: 1px solid #e0e0e0; }
+        .card { border: none; border-radius: 1rem; box-shadow: 0 2px 12px rgba(26,35,126,0.06); background: #fff; }
+        .card .card-body i { margin-bottom: 8px; display: block; color: #14213d; }
+        .card .card-body h4 { font-weight: bold; color: #14213d; }
+        .card .card-body p { color: #757575; }
+        .btn-primary { background: #14213d; border: none; color: #fff; box-shadow: 0 2px 8px rgba(21,101,192,0.08); }
+        .btn-primary:hover { background: #1f2a48; color: #fca311; }
+        .btn-success { background: #e3eafc; border: none; color: #14213d; }
+        .btn-success:hover { background: #bbdefb; color: #14213d; }
+        .btn-warning { background: #fff8e1; border: none; color: #bfa100; }
+        .btn-warning:hover { background: #ffe082; color: #7c6f00; }
+        .btn-danger { background: #e57373; border: none; }
+        .btn-danger:hover { background: #c62828; }
+        .btn-info { background: #e3f2fd; border: none; color: #14213d; }
+        .btn-info:hover { background: #bbdefb; color: #14213d; }
+        .alert-info { background: #e3eafc; color: #14213d; border: none; }
+        @media (max-width: 768px) { .sidebar { min-width: 100vw; max-width: 100vw; min-height: auto; } }
+    </style>
 </head>
 <body class="d-flex">
     <nav class="sidebar">
@@ -120,6 +36,7 @@
         <a href="/admin/livres/list"><i class="bi bi-book me-2"></i>Livres</a>
         <a href="/admin/adherents/list"><i class="bi bi-people me-2"></i>Adhérents</a>
         <a href="/admin/prets/list"><i class="bi bi-list-check me-2"></i>Prêts</a>
+        <a href="/admin/reservations"><i class="bi bi-bookmark-check me-2"></i>Réservations</a>
         <a href="/admin/penalites/list"><i class="bi bi-exclamation-triangle me-2"></i>Pénalités</a>
         <a href="/admin/notifications/list"><i class="bi bi-bell me-2"></i>Notifications</a>
         <form th:action="@{/logout}" method="post" style="display: inline;">
@@ -240,41 +157,30 @@
             </div>
         </div>
 
-        <!-- Statistiques de notes -->
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Répartition des notes</h5>
-                        <canvas id="notesChart" width="400" height="200"></canvas>
-                        <div class="mt-2">
-                            <span th:text="${totalAvis}"></span> avis au total
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Top livres les mieux notés</h5>
-                        <table class="table table-sm table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Livre</th>
-                                    <th>Moyenne</th>
-                                    <th>Nb avis</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:each="row : ${topLivres}">
-                                    <td th:text="${row[0].titre}"></td>
-                                    <td th:text="${#numbers.formatDecimal(row[1], 1, 2)}"></td>
-                                    <td th:text="${row[2]}"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+        <!-- Derniers avis/notes -->
+        <div class="mb-4">
+            <h5 class="mb-3">Derniers avis/notes</h5>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Livre</th>
+                            <th>Adhérent</th>
+                            <th>Note</th>
+                            <th>Commentaire</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="avis : ${lastAvis}">
+                            <td th:text="${avis[0]}">Livre</td>
+                            <td th:text="${avis[1]} + ' ' + ${avis[2]}">Adhérent</td>
+                            <td th:text="${avis[3]}">Note</td>
+                            <td th:text="${avis[4]}">Commentaire</td>
+                            <td th:text="${#temporals.format(avis[5], 'dd/MM/yyyy')}">Date</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
@@ -287,124 +193,24 @@
             </div>
         </div>
     </main>
-    <script th:inline="javascript">
-        // Récupération des données Thymeleaf
-        const statsData = {
-            labels: [
-                'Livres',
-                'Adhérents',
-                'Prêts actifs',
-                'Réservations',
-                'Pénalités',
-                'Notifications'
-            ],
-            datasets: [{
-                label: 'Total',
-                data: [
-                    /*[[${totalLivres}]]*/,
-                    /*[[${totalAdherents}]]*/,
-                    /*[[${totalPretsActifs}]]*/,
-                    /*[[${totalReservations}]]*/,
-                    /*[[${totalPenalites}]]*/,
-                    /*[[${totalNotifications}]]*/
-                ],
-                backgroundColor: [
-                    '#1565c0',
-                    '#fca311',
-                    '#2a9d8f',
-                    '#e76f51',
-                    '#bfa100',
-                    '#6d6875'
-                ],
-                borderColor: '#fff',
-                borderWidth: 1
-            }]
-        };
-
-        let chartType = 'bar';
-        const ctx = document.getElementById('statsChart').getContext('2d');
-        let statsChart = new Chart(ctx, {
-            type: chartType,
-            data: statsData,
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: chartType === 'pie' },
-                    title: { display: false }
-                },
-                scales: chartType === 'bar' ? {
-                    y: { beginAtZero: true }
-                } : {}
-            }
-        });
-
-        function resizeChartCanvas(type) {
-            const chartContainer = document.getElementById('chartContainer');
-            const canvas = document.getElementById('statsChart');
-            if (type === 'pie') {
-                chartContainer.style.maxWidth = '320px';
-                chartContainer.style.width = '320px';
-                canvas.style.width = '320px';
-                canvas.style.height = '320px';
-            } else {
-                chartContainer.style.maxWidth = '100%';
-                chartContainer.style.width = '100%';
-                canvas.style.width = '100%';
-                canvas.style.height = '220px';
-            }
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    window.onload = function() {
+      const ctx = document.getElementById('statsChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Livres', 'Adhérents', 'Prêts actifs', 'Réservations', 'Pénalités', 'Notifications'],
+          datasets: [{
+            label: 'Total',
+            data: [2, 2, 0, 1, 1, 2],
+            backgroundColor: [
+              '#1565c0', '#fca311', '#2a9d8f', '#e76f51', '#bfa100', '#6d6875'
+            ]
+          }]
         }
-        // Initial resize
-        resizeChartCanvas(chartType);
-        document.getElementById('chartTypeSelect').addEventListener('change', function() {
-            chartType = this.value;
-            statsChart.destroy();
-            // Supprimer et recréer le canvas pour éviter les bugs de taille
-            const chartContainer = document.getElementById('chartContainer');
-            chartContainer.removeChild(document.getElementById('statsChart'));
-            const newCanvas = document.createElement('canvas');
-            newCanvas.id = 'statsChart';
-            chartContainer.appendChild(newCanvas);
-            resizeChartCanvas(chartType);
-            const ctxNew = newCanvas.getContext('2d');
-            statsChart = new Chart(ctxNew, {
-                type: chartType,
-                data: statsData,
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { display: chartType === 'pie' },
-                        title: { display: false }
-                    },
-                    scales: chartType === 'bar' ? {
-                        y: { beginAtZero: true }
-                    } : {}
-                }
-            });
-        });
-
-        const ctxNotes = document.getElementById('notesChart').getContext('2d');
-        const notesChart = new Chart(ctxNotes, {
-            type: 'bar',
-            data: {
-                labels: ['5 étoiles', '4 étoiles', '3 étoiles', '2 étoiles', '1 étoile'],
-                datasets: [{
-                    label: 'Nombre de notes',
-                    data: [/*[[${nbNotes5}]], [[${nbNotes4}]], [[${nbNotes3}]], [[${nbNotes2}]], [[${nbNotes1}]]*/],
-                    backgroundColor: [
-                        '#f7c948', '#b0c4de', '#90caf9', '#ffe082', '#e57373'
-                    ]
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    y: { beginAtZero: true }
-                }
-            }
-        });
+      });
+    };
     </script>
 </body>
 </html> 

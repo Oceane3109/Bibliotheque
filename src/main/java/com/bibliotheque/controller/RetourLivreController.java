@@ -99,7 +99,6 @@ public class RetourLivreController {
         }
         RetourLivre retour = new RetourLivre();
         retour.setPretLivre(pretOpt.get());
-        retour.setDateRetour(java.time.LocalDate.now());
         model.addAttribute("retourLivre", retour);
         model.addAttribute("prets", pretLivreService.getAllPrets());
         return "admin/retours/form";
