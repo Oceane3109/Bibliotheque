@@ -175,7 +175,74 @@
                 </div>
             </div>
         </div>
+
+        <!-- Bloc d'avis/notation -->
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5 class="card-title">Donner votre avis</h5>
+                <div th:if="${noteDejaDonnee}">
+                    <div class="alert alert-info">Vous avez déjà noté ce livre.</div>
+                </div>
+                <form th:if="${!noteDejaDonnee}" th:action="@{'/adherent/livre/' + ${livre.idLivre} + '/noter'}" method="post">
+                    <div class="mb-2">
+                        <label for="note">Note :</label>
+                        <div id="etoiles">
+                            <input type="radio" id="star5" name="note" value="5" required><label for="star5">★</label>
+                            <input type="radio" id="star4" name="note" value="4"><label for="star4">★</label>
+                            <input type="radio" id="star3" name="note" value="3"><label for="star3">★</label>
+                            <input type="radio" id="star2" name="note" value="2"><label for="star2">★</label>
+                            <input type="radio" id="star1" name="note" value="1"><label for="star1">★</label>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <label for="commentaire">Commentaire (optionnel) :</label>
+                        <textarea class="form-control" id="commentaire" name="commentaire" maxlength="500"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Envoyer</button>
+                </form>
+                <div class="mt-3">
+                    <h6>Moyenne des notes :</h6>
+                    <span th:if="${moyenneNote != null}" th:text="${#numbers.formatDecimal(moyenneNote, 1, 2)} + ' / 5'"></span>
+                    <span th:if="${moyenneNote == null}">Aucune note pour ce livre.</span>
+                    <span th:if="${avis != null}" class="ms-2">(<span th:text="${#lists.size(avis)}"></span> avis)</span>
+                </div>
+                <div class="mt-3" th:if="${avis != null && #lists.size(avis) > 0}">
+                    <h6>Derniers avis :</h6>
+                    <ul class="list-group">
+                        <li class="list-group-item" th:each="a : ${avis}">
+                            <span th:text="${a.adherent.prenom + ' ' + a.adherent.nom}"></span> -
+                            <span th:each="i : ${#numbers.sequence(1, a.note)}">★</span>
+                            <span th:each="i : ${#numbers.sequence(a.note+1, 5)}" style="color:#ccc;">★</span>
+                            <span class="text-muted ms-2" th:text="${#temporals.format(a.date, 'dd/MM/yyyy')}"></span>
+                            <div th:if="${a.commentaire != null}" th:text="${a.commentaire}" class="mt-1"></div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <style>
+    #etoiles {
+        direction: rtl;
+        unicode-bidi: bidi-override;
+        display: inline-block;
+    }
+    #etoiles input[type="radio"] {
+        display: none;
+    }
+    #etoiles label {
+        font-size: 2rem;
+        color: #ccc;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+    #etoiles input[type="radio"]:checked ~ label,
+    #etoiles label:hover,
+    #etoiles label:hover ~ label {
+        color: #f7c948;
+    }
+    </style>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>

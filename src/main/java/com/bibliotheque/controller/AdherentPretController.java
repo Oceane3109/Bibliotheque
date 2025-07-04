@@ -195,36 +195,6 @@ public class AdherentPretController {
         return "adherent/catalogue";
     }
 
-    @GetMapping("/adherent/livre/{id}")
-    public String detailLivre(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails, Model model) {
-        if (userDetails == null) return "redirect:/login";
-        String username = userDetails.getUsername();
-        var userOpt = userService.getUserByUsername(username);
-        if (userOpt.isEmpty()) return "redirect:/login";
-        var adherentOpt = adherentService.getAdherentByUser(userOpt.get());
-        if (adherentOpt.isEmpty()) return "redirect:/login";
-        Adherent adherent = adherentOpt.get();
-        
-        Optional<Livre> livreOpt = livreService.getLivreById(id);
-        if (livreOpt.isEmpty()) return "redirect:/adherent/catalogue";
-        
-        Livre livre = livreOpt.get();
-        List<Exemplaire> exemplairesDisponibles = exemplaireService.getExemplairesDisponiblesByLivre(livre);
-        List<TypePret> typesPret = typePretService.getAllTypePrets();
-        int notificationsNonLuesCount = notificationService.getNotificationsNonLuesByAdherent(adherent).size();
-        
-        // Vérifier si l'adhérent est pénalisé
-        boolean isPenalise = adherentService.isPenalise(adherent.getIdAdherent());
-        adherent.setPenalise(isPenalise);
-        
-        model.addAttribute("livre", livre);
-        model.addAttribute("exemplairesDisponibles", exemplairesDisponibles);
-        model.addAttribute("typesPret", typesPret);
-        model.addAttribute("adherent", adherent);
-        model.addAttribute("notificationsNonLuesCount", notificationsNonLuesCount);
-        return "adherent/detail-livre";
-    }
-
     @PostMapping("/adherent/emprunter/{exemplaireId}")
     public String emprunterLivre(@PathVariable Long exemplaireId, 
                                 @RequestParam("typePretId") Long typePretId,

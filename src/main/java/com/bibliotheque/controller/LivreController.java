@@ -2,6 +2,9 @@ package com.bibliotheque.controller;
 
 import com.bibliotheque.model.Livre;
 import com.bibliotheque.service.LivreService;
+import com.bibliotheque.service.UserService;
+import com.bibliotheque.service.AdherentService;
+import com.bibliotheque.service.NoteLivreService;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
@@ -9,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -24,10 +30,16 @@ import java.util.Optional;
 public class LivreController {
 
     private final LivreService livreService;
+    private final UserService userService;
+    private final AdherentService adherentService;
+    private final NoteLivreService noteLivreService;
 
     @Autowired
-    public LivreController(LivreService livreService) {
+    public LivreController(LivreService livreService, UserService userService, AdherentService adherentService, NoteLivreService noteLivreService) {
         this.livreService = livreService;
+        this.userService = userService;
+        this.adherentService = adherentService;
+        this.noteLivreService = noteLivreService;
     }
 
     @GetMapping
