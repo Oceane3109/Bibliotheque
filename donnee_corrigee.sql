@@ -9,9 +9,9 @@ INSERT INTO type_adherent (nom_type, description) VALUES
 
 -- Insertion des utilisateurs
 INSERT INTO users (nom_utilisateur, mot_de_passe, email, date_creation, est_admin) VALUES
-('admin1', 'admin123', 'admin@biblio.com', '2025-07-01', TRUE),
-('jean.dupont', 'jean123', 'jean.dupont@email.com', '2025-07-01', FALSE),
-('marie.curie', 'marie123', 'marie.curie@email.com', '2025-07-01', FALSE);
+('admin1', '$2a$10$P.M/0GzcmU4ZWEBGAMnghuqBtT4sLS7Z7E4XaJI9hHgR3EpQN7MTq', 'admin@biblio.com', '2025-07-01', TRUE),
+('jean.dupont', '$2a$10$HX0PxnntLeXhe32gueOiA.4cfmcSGiPYPyH9elS2g3d0a2ayB8SBa', 'jean.dupont@email.com', '2025-07-01', FALSE),
+('marie.curie', '$2a$10$DQNXmBFGoYLCAUHfZQhgfO7qTdDlQ8JJ1eRC64mEcJL793os83nVG', 'marie.curie@email.com', '2025-07-01', FALSE);
 
 -- Insertion des adhérents
 INSERT INTO adherents (id_user, id_type_adherent, nom, prenom, adresse, email, telephone, date_inscription, date_naissance, max_livres_domicile, max_livres_surplace, livres_empruntes_domicile, livres_empruntes_surplace, duree_pret) VALUES
@@ -46,9 +46,9 @@ INSERT INTO prets_livre (id_adherent, id_exemplaire, id_type_pret, date_debut, d
 -- Mise à jour de l'état de l'exemplaire
 UPDATE exemplaires SET etat = 'en_pret' WHERE code_exemplaire = '1984-001';
 
--- Insertion d'une réservation (avec date_reservation au lieu de date_pret)
-INSERT INTO reservations (id_adherent, id_livre, date_reservation, etat_reservation) VALUES
-((SELECT id_adherent FROM adherents WHERE nom = 'Curie'), (SELECT id_livre FROM livres WHERE titre = '1984'), '2025-07-16', 'en_attente');
+-- Insertion d'une réservation (avec date_pret et date_fin_pret)
+INSERT INTO reservations (id_adherent, id_livre, date_pret, date_fin_pret, etat_reservation) VALUES
+((SELECT id_adherent FROM adherents WHERE nom = 'Curie'), (SELECT id_livre FROM livres WHERE titre = '1984'), '2025-07-16', '2025-07-30', 'en_attente');
 
 -- Insertion d'une pénalité (avec id_pret_livre au lieu de id_pret)
 INSERT INTO penalites (id_pret_livre, motif, jours_penalite, date_emission) VALUES

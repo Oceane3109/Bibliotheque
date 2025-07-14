@@ -19,4 +19,13 @@ public interface ProlongementPretRepository extends JpaRepository<ProlongementPr
     Optional<ProlongementPret> findFirstByPretLivreOrderByDateDemandeDesc(PretLivre pretLivre);
     @Query("SELECT p FROM ProlongementPret p JOIN FETCH p.pretLivre pr JOIN FETCH pr.exemplaire e JOIN FETCH e.livre WHERE pr.adherent = :adherent")
     List<ProlongementPret> findByPretLivre_Adherent(@Param("adherent") Adherent adherent);
+    int countByPretLivre_AdherentAndEtatProlongation(Adherent adherent, String etatProlongation);
+    
+    @Query("SELECT p FROM ProlongementPret p " +
+           "JOIN FETCH p.pretLivre pr " +
+           "JOIN FETCH pr.adherent a " +
+           "JOIN FETCH pr.exemplaire e " +
+           "JOIN FETCH e.livre l " +
+           "ORDER BY p.dateDemande DESC")
+    List<ProlongementPret> findAllWithRelations();
 } 

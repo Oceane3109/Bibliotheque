@@ -50,7 +50,8 @@ CREATE TABLE livres (
     age_minimum INTEGER,
     image_nom VARCHAR(255),
     image_type VARCHAR(100),
-    image_donnees BYTEA
+    image_donnees BYTEA,
+    image_url VARCHAR(500)
 );
 
 -- Table des exemplaires
@@ -155,3 +156,9 @@ CREATE TABLE notes_livres (
     date TIMESTAMP NOT NULL,
     CONSTRAINT unique_livre_adherent UNIQUE (livre_id, adherent_id)
 );
+
+
+
+
+javac -cp "$(cat cp.txt)" HashGenerator.java
+java -cp ".:$(cat cp.txt)" HashGenerator 

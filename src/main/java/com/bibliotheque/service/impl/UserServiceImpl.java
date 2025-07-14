@@ -71,4 +71,9 @@ public class UserServiceImpl implements UserService {
                 .map(User::getEstAdmin)
                 .orElse(false);
     }
+
+    @Override
+    public List<User> getAllAdmins() {
+        return userRepository.findByEstAdminTrue();
+    }
 } 

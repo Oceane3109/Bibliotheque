@@ -16,6 +16,8 @@ import com.bibliotheque.service.LivreService;
 import com.bibliotheque.service.ExemplaireService;
 import com.bibliotheque.service.ReservationService;
 import com.bibliotheque.service.TypePretService;
+import com.bibliotheque.service.JourFerieService;
+import com.bibliotheque.service.AbonnementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -35,6 +37,9 @@ import java.util.stream.Collectors;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Optional;
+import com.bibliotheque.model.Notification;
+import com.bibliotheque.model.User;
+import java.time.DayOfWeek;
 
 @Controller
 public class AdherentPretController {
@@ -47,6 +52,8 @@ public class AdherentPretController {
     private final ExemplaireService exemplaireService;
     private final ReservationService reservationService;
     private final TypePretService typePretService;
+    private final JourFerieService jourFerieService;
+    private final AbonnementService abonnementService;
 
     @Autowired
     public AdherentPretController(AdherentService adherentService, 
@@ -57,7 +64,9 @@ public class AdherentPretController {
                                 LivreService livreService,
                                 ExemplaireService exemplaireService,
                                 ReservationService reservationService,
-                                TypePretService typePretService) {
+                                TypePretService typePretService,
+                                JourFerieService jourFerieService,
+                                AbonnementService abonnementService) {
         this.adherentService = adherentService;
         this.pretLivreService = pretLivreService;
         this.userService = userService;
@@ -67,6 +76,8 @@ public class AdherentPretController {
         this.exemplaireService = exemplaireService;
         this.reservationService = reservationService;
         this.typePretService = typePretService;
+        this.jourFerieService = jourFerieService;
+        this.abonnementService = abonnementService;
     }
 
     @GetMapping("/mes-prets")
@@ -80,19 +91,19 @@ public class AdherentPretController {
         Adherent adherent = adherentOpt.get();
         int notificationsNonLuesCount = notificationService.getNotificationsNonLuesByAdherent(adherent).size();
 
-        // Prêts actifs de l'adhérent
-        List<PretLivre> pretsActifs = pretLivreService.getPretsByAdherentAndEtat(adherent, "actif");
-        List<PretLivre> pretsRetard = pretLivreService.getPretsByAdherentAndEtat(adherent, "retard");
+        // Prêts actifs et inactifs de l'adhérent
+        List<PretLivre> pretsActifs = pretLivreService.getPretsActifsByAdherent(adherent);
+        List<PretLivre> pretsInactifs = pretLivreService.getPretsInactifsByAdherent(adherent);
 
         // Compteurs
         int maxDomicile = adherent.getMaxLivresDomicile();
         int maxSurplace = adherent.getMaxLivresSurplace();
-        int empruntesDomicile = adherent.getLivresEmpruntesDomicile();
-        int empruntesSurplace = adherent.getLivresEmpruntesSurplace();
+        int empruntesDomicile = pretLivreService.countPretsEnCoursDomicileByAdherent(adherent);
+        int empruntesSurplace = pretLivreService.countPretsEnCoursSurPlaceByAdherent(adherent);
         int restantDomicile = maxDomicile - empruntesDomicile;
         int restantSurplace = maxSurplace - empruntesSurplace;
 
-        // Calcul du temps restant pour chaque prêt
+        // Calcul du temps restant pour chaque prêt actif
         var pretsAvecTempsRestant = pretsActifs.stream().map(pret -> {
             long joursRestant = ChronoUnit.DAYS.between(LocalDate.now(), pret.getDateFin());
             return new Object[] { pret, joursRestant };
@@ -109,9 +120,14 @@ public class AdherentPretController {
             }
         }
 
+        // Vérification du quota de prolongements
+        int prolongementsApprouves = prolongementPretService.getNombreProlongementsApprouvesByAdherent(adherent);
+        boolean quotaDepasse = prolongementsApprouves >= adherent.getQuotaProlongements();
+        int prolongementsRestants = adherent.getQuotaProlongements() - prolongementsApprouves;
+
         model.addAttribute("adherent", adherent);
         model.addAttribute("pretsActifs", pretsActifs);
-        model.addAttribute("pretsRetard", pretsRetard);
+        model.addAttribute("pretsInactifs", pretsInactifs);
         model.addAttribute("pretsAvecTempsRestant", pretsAvecTempsRestant);
         model.addAttribute("restantDomicile", restantDomicile);
         model.addAttribute("restantSurplace", restantSurplace);
@@ -121,6 +137,9 @@ public class AdherentPretController {
         model.addAttribute("maxSurplace", maxSurplace);
         model.addAttribute("etatProlongementParPret", etatProlongementParPret);
         model.addAttribute("notificationsNonLuesCount", notificationsNonLuesCount);
+        model.addAttribute("prolongementsApprouves", prolongementsApprouves);
+        model.addAttribute("quotaDepasse", quotaDepasse);
+        model.addAttribute("prolongementsRestants", prolongementsRestants);
         return "adherent/mes-prets";
     }
 
@@ -142,6 +161,9 @@ public class AdherentPretController {
 
     @GetMapping("/demande-prolongement/{pretId}")
     public String showDemandeProlongement(@PathVariable Long pretId, @AuthenticationPrincipal UserDetails userDetails, Model model) {
+        System.out.println("=== DÉBUT showDemandeProlongement ===");
+        System.out.println("pretId: " + pretId);
+        
         if (userDetails == null) return "redirect:/login";
         String username = userDetails.getUsername();
         var userOpt = userService.getUserByUsername(username);
@@ -149,17 +171,39 @@ public class AdherentPretController {
         var adherentOpt = adherentService.getAdherentByUser(userOpt.get());
         if (adherentOpt.isEmpty()) return "redirect:/login";
         Adherent adherent = adherentOpt.get();
+        
+        // Vérifier si l'adhérent est pénalisé
+        if (adherentService.isPenalise(adherent.getIdAdherent())) {
+            return "redirect:/adherent/mes-prets";
+        }
+        
         int notificationsNonLuesCount = notificationService.getNotificationsNonLuesByAdherent(adherent).size();
-        var pretOpt = pretLivreService.getPretById(pretId);
+        var pretOpt = pretLivreService.getPretByIdWithRelations(pretId);
+        System.out.println("Prêt trouvé: " + pretOpt.isPresent());
+        if (pretOpt.isPresent()) {
+            PretLivre pret = pretOpt.get();
+            System.out.println("Prêt ID: " + pret.getIdPret());
+            System.out.println("Prêt adhérent: " + (pret.getAdherent() != null ? pret.getAdherent().getIdAdherent() : "NULL"));
+            System.out.println("Adhérent connecté: " + adherent.getIdAdherent());
+            System.out.println("Adhérents égaux: " + (pret.getAdherent() != null && pret.getAdherent().getIdAdherent().equals(adherent.getIdAdherent())));
+        }
+        if (pretOpt.isEmpty() || pretOpt.get().getAdherent() == null || !pretOpt.get().getAdherent().getIdAdherent().equals(adherent.getIdAdherent())) {
+            System.out.println("Prêt non trouvé ou non autorisé - redirection");
+            return "redirect:/adherent/mes-prets";
+        }
         ProlongementPret prolongement = new ProlongementPret();
         prolongement.setPretLivre(pretOpt.get());
         model.addAttribute("prolongementPret", prolongement);
+        model.addAttribute("pretId", pretId);
         model.addAttribute("notificationsNonLuesCount", notificationsNonLuesCount);
         return "adherent/demande-prolongement";
     }
 
     @PostMapping("/demande-prolongement/{pretId}")
     public String submitDemandeProlongement(@PathVariable Long pretId, @ModelAttribute("prolongementPret") ProlongementPret prolongementPret, @AuthenticationPrincipal UserDetails userDetails, RedirectAttributes redirectAttributes) {
+        System.out.println("=== DÉBUT submitDemandeProlongement ===");
+        System.out.println("pretId: " + pretId);
+        
         if (userDetails == null) return "redirect:/login";
         String username = userDetails.getUsername();
         var userOpt = userService.getUserByUsername(username);
@@ -167,12 +211,45 @@ public class AdherentPretController {
         var adherentOpt = adherentService.getAdherentByUser(userOpt.get());
         if (adherentOpt.isEmpty()) return "redirect:/login";
         Adherent adherent = adherentOpt.get();
-        var pretOpt = pretLivreService.getPretById(pretId);
-        if (pretOpt.isEmpty() || !pretOpt.get().getAdherent().equals(adherent)) return "redirect:/adherent/mes-prets";
+        
+        // Vérifier si l'adhérent est pénalisé
+        if (adherentService.isPenalise(adherent.getIdAdherent())) {
+            redirectAttributes.addFlashAttribute("error", "Vous êtes actuellement suspendu et ne pouvez pas effectuer cette action. Veuillez contacter la bibliothèque pour plus d'informations.");
+            return "redirect:/adherent/mes-prets";
+        }
+        
+        System.out.println("Adhérent: " + adherent.getNom() + " " + adherent.getPrenom());
+        System.out.println("Quota actuel: " + adherent.getQuotaProlongements());
+        
+        // Vérification du quota de prolongements
+        int prolongementsApprouves = prolongementPretService.getNombreProlongementsApprouvesByAdherent(adherent);
+        System.out.println("Prolongements approuvés: " + prolongementsApprouves);
+        
+        if (prolongementsApprouves >= adherent.getQuotaProlongements()) {
+            System.out.println("Quota dépassé - redirection");
+            redirectAttributes.addFlashAttribute("error", "Vous avez utilisé toutes vos demandes de prolongement autorisées.");
+            return "redirect:/adherent/mes-prets";
+        }
+        
+        var pretOpt = pretLivreService.getPretByIdWithRelations(pretId);
+        if (pretOpt.isEmpty() || pretOpt.get().getAdherent() == null || !pretOpt.get().getAdherent().getIdAdherent().equals(adherent.getIdAdherent())) {
+            System.out.println("Prêt non trouvé ou non autorisé - redirection");
+            return "redirect:/adherent/mes-prets";
+        }
+        
+        System.out.println("Prêt trouvé: " + pretOpt.get().getIdPret());
+        System.out.println("Date demande: " + prolongementPret.getDateDemande());
+        System.out.println("Nouvelle date fin: " + prolongementPret.getNouvelleDateFin());
+        
         prolongementPret.setPretLivre(pretOpt.get());
         prolongementPret.setEtatProlongation("en_attente");
-        prolongementPretService.saveProlongement(prolongementPret);
+        
+        System.out.println("Sauvegarde du prolongement...");
+        ProlongementPret saved = prolongementPretService.saveProlongement(prolongementPret);
+        System.out.println("Prolongement sauvegardé avec ID: " + saved.getIdProlongation());
+        
         redirectAttributes.addFlashAttribute("success", "Demande de prolongement envoyée");
+        System.out.println("=== FIN submitDemandeProlongement ===");
         return "redirect:/adherent/mes-prolongements";
     }
 
@@ -226,15 +303,18 @@ public class AdherentPretController {
         }
         
         // Vérifier les limites de prêt
-        if (typePret.getNomTypePret().equalsIgnoreCase("domicile")) {
-            if (adherent.getLivresEmpruntesDomicile() >= adherent.getMaxLivresDomicile()) {
-                redirectAttributes.addFlashAttribute("error", "Vous avez atteint votre limite de prêts à domicile");
-                return "redirect:/adherent/livre/" + exemplaire.getLivre().getIdLivre();
-            }
-        } else if (typePret.getNomTypePret().equalsIgnoreCase("sur_place")) {
-            if (adherent.getLivresEmpruntesSurplace() >= adherent.getMaxLivresSurplace()) {
-                redirectAttributes.addFlashAttribute("error", "Vous avez atteint votre limite de prêts sur place");
-                return "redirect:/adherent/livre/" + exemplaire.getLivre().getIdLivre();
+        boolean abonneActif = abonnementService.getAbonnementActifByAdherent(adherent).isPresent();
+        if (!abonneActif) {
+            if (typePret.getNomTypePret().equalsIgnoreCase("domicile")) {
+                if (pretLivreService.countPretsEnCoursDomicileByAdherent(adherent) >= adherent.getMaxLivresDomicile()) {
+                    redirectAttributes.addFlashAttribute("error", "Vous avez atteint votre limite de prêts à domicile");
+                    return "redirect:/adherent/livre/" + exemplaire.getLivre().getIdLivre();
+                }
+            } else if (typePret.getNomTypePret().equalsIgnoreCase("sur_place")) {
+                if (pretLivreService.countPretsEnCoursSurPlaceByAdherent(adherent) >= adherent.getMaxLivresSurplace()) {
+                    redirectAttributes.addFlashAttribute("error", "Vous avez atteint votre limite de prêts sur place");
+                    return "redirect:/adherent/livre/" + exemplaire.getLivre().getIdLivre();
+                }
             }
         }
         
@@ -245,7 +325,8 @@ public class AdherentPretController {
         pret.setTypePret(typePret);
         pret.setDateDebut(LocalDate.now());
         pret.setDateFin(LocalDate.now().plusDays(adherent.getDureePret()));
-        pret.setEtatPret("actif");
+        pret.setEtatPret("en_cours");
+        pret.setDatePret(LocalDate.now());
         
         try {
             pretLivreService.savePret(pret);
@@ -274,47 +355,83 @@ public class AdherentPretController {
     public String reserverLivre(@PathVariable Long livreId,
                                @RequestParam("datePret") String datePretStr,
                                @RequestParam("dateFinPret") String dateFinPretStr,
+                               @RequestParam("typePretId") Long typePretId,
                                @AuthenticationPrincipal UserDetails userDetails,
                                RedirectAttributes redirectAttributes) {
         if (userDetails == null) return "redirect:/login";
+        if (datePretStr == null || datePretStr.isEmpty() || dateFinPretStr == null || dateFinPretStr.isEmpty() || typePretId == null) {
+            redirectAttributes.addFlashAttribute("error", "Veuillez renseigner la date de début, la date de fin et le type de prêt.");
+            return "redirect:/adherent/livre/" + livreId;
+        }
         String username = userDetails.getUsername();
         var userOpt = userService.getUserByUsername(username);
         if (userOpt.isEmpty()) return "redirect:/login";
         var adherentOpt = adherentService.getAdherentByUser(userOpt.get());
         if (adherentOpt.isEmpty()) return "redirect:/login";
         Adherent adherent = adherentOpt.get();
-        
         Optional<Livre> livreOpt = livreService.getLivreById(livreId);
         if (livreOpt.isEmpty()) {
             redirectAttributes.addFlashAttribute("error", "Livre non trouvé");
             return "redirect:/adherent/catalogue";
         }
-        
         Livre livre = livreOpt.get();
-        
         // Vérifier si l'adhérent a déjà une réservation pour ce livre
         List<Reservation> reservationsExistantes = reservationService.getReservationsByAdherentAndLivre(adherent, livre);
         if (!reservationsExistantes.isEmpty()) {
             redirectAttributes.addFlashAttribute("error", "Vous avez déjà une réservation pour ce livre");
             return "redirect:/adherent/livre/" + livreId;
         }
-        
+        Optional<TypePret> typePretOpt = typePretService.getTypePretById(typePretId);
+        if (typePretOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Type de prêt invalide");
+            return "redirect:/adherent/livre/" + livreId;
+        }
+        // Validation de la durée de réservation
+        LocalDate datePret = LocalDate.parse(datePretStr);
+        LocalDate dateFinPret = LocalDate.parse(dateFinPretStr);
+        // Récupérer tous les jours fériés
+        List<LocalDate> joursFeries = jourFerieService.getAllJoursFeries().stream().map(jf -> jf.getDateFeriee()).collect(Collectors.toList());
+        long joursOuvres = 0;
+        LocalDate d = datePret;
+        while (!d.isAfter(dateFinPret)) {
+            boolean isSunday = d.getDayOfWeek() == DayOfWeek.SUNDAY;
+            boolean isFerie = joursFeries.contains(d);
+            boolean isOuvre = !isSunday && !isFerie;
+            System.out.println("Date: " + d + " | Dimanche: " + isSunday + " | Férié: " + isFerie + " | Compté: " + isOuvre);
+            if (isOuvre) {
+                joursOuvres++;
+            }
+            d = d.plusDays(1);
+        }
+        System.out.println("Total jours ouvrés: " + joursOuvres);
+        // DEBUG : Afficher le détail du calcul
+        System.out.println("Calcul jours ouvrés entre " + datePret + " et " + dateFinPret + ": " + joursOuvres + " jours ouvrés (dimanches et fériés exclus)");
+        if (joursOuvres > adherent.getDureePret()) {
+            redirectAttributes.addFlashAttribute("error", "La durée maximale de prêt autorisée (hors dimanches et jours fériés) est de " + adherent.getDureePret() + " jours ouvrés. Veuillez choisir une date de retour plus proche.");
+            return "redirect:/adherent/livre/" + livreId;
+        }
         // Créer la réservation
         Reservation reservation = new Reservation();
         reservation.setAdherent(adherent);
         reservation.setLivre(livre);
-        reservation.setDatePret(LocalDate.parse(datePretStr));
-        reservation.setDateFinPret(LocalDate.parse(dateFinPretStr));
+        reservation.setDatePret(datePret);
+        reservation.setDateFinPret(dateFinPret);
+        reservation.setTypePret(typePretOpt.get());
         reservation.setEtatReservation("en_attente");
-        
         try {
             reservationService.saveReservation(reservation);
         } catch (IllegalStateException e) {
             redirectAttributes.addFlashAttribute("error", "Vous êtes actuellement suspendu et ne pouvez pas faire de réservations. Veuillez contacter la bibliothèque pour plus d'informations.");
             return "redirect:/adherent/livre/" + livreId;
         }
-        
-        redirectAttributes.addFlashAttribute("success", "Réservation effectuée avec succès !");
+        Notification notif = new Notification();
+        notif.setAdherent(adherent);
+        notif.setTitre("Demande de réservation reçue");
+        notif.setMessage("Nouvelle demande de réservation de " + adherent.getNom() + " " + adherent.getPrenom() + " (" + adherent.getUser().getNomUtilisateur() + ") pour le livre '" + livre.getTitre() + "'.");
+        notif.setDateEnvoi(java.time.LocalDateTime.now());
+        notif.setLu(false);
+        notificationService.saveNotification(notif);
+        redirectAttributes.addFlashAttribute("success", "Réservation enregistrée avec succès");
         return "redirect:/adherent/mes-reservations";
     }
 

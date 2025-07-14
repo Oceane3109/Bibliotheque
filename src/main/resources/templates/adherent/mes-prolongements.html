@@ -8,7 +8,12 @@
 </head>
 <body>
 <div class="container mt-4">
-    <h2>Mes prolongements de prêt</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Mes prolongements de prêt</h2>
+        <a th:href="@{/adherent/dashboard}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Retour au dashboard
+        </a>
+    </div>
     <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
     
     <div th:if="${#lists.isEmpty(prolongements)}" class="alert alert-info">
@@ -28,8 +33,8 @@
             <tbody>
             <tr th:each="prolongement : ${prolongements}">
                 <td th:text="${prolongement.pretLivre != null && prolongement.pretLivre.exemplaire != null && prolongement.pretLivre.exemplaire.livre != null ? prolongement.pretLivre.exemplaire.livre.titre : 'Livre non disponible'}"></td>
-                <td th:text="${#dates.format(prolongement.dateDemande, 'dd/MM/yyyy')}"></td>
-                <td th:text="${#dates.format(prolongement.nouvelleDateFin, 'dd/MM/yyyy')}"></td>
+                <td th:text="${#temporals.format(prolongement.dateDemande, 'dd/MM/yyyy')}"></td>
+                <td th:text="${#temporals.format(prolongement.nouvelleDateFin, 'dd/MM/yyyy')}"></td>
                 <td>
                     <span th:if="${prolongement.etatProlongation == 'en_attente'}" class="badge bg-warning">En attente</span>
                     <span th:if="${prolongement.etatProlongation == 'approuvee'}" class="badge bg-success">Approuvée</span>

@@ -42,6 +42,7 @@
         <a href="/admin/adherents/list"><i class="bi bi-people me-2"></i>Adhérents</a>
         <a href="/admin/prets/list"><i class="bi bi-list-check me-2"></i>Prêts</a>
         <a href="/admin/reservations"><i class="bi bi-bookmark-check me-2"></i>Réservations</a>
+        <a href="/admin/prolongements"><i class="bi bi-clock-history me-2"></i>Prolongements</a>
         <a href="/admin/penalites/list"><i class="bi bi-exclamation-triangle me-2"></i>Pénalités</a>
         <a href="/admin/notifications/list"><i class="bi bi-bell me-2"></i>Notifications</a>
         <form th:action="@{/logout}" method="post" style="display: inline;">
@@ -142,6 +143,11 @@
             <div class="col-md-2">
                 <a href="/admin/notifications/create" class="btn btn-info w-100 mb-2">
                     <i class="bi bi-bell-plus"></i> Nouvelle notification
+                </a>
+            </div>
+            <div class="col-md-2">
+                <a href="/admin/prolongements" class="btn btn-warning w-100 mb-2">
+                    <i class="bi bi-clock-history"></i> Gérer les prolongements
                 </a>
             </div>
         </div>

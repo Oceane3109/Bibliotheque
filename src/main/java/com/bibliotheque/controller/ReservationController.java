@@ -12,6 +12,8 @@ import com.bibliotheque.service.LivreService;
 import com.bibliotheque.service.PretLivreService;
 import com.bibliotheque.service.ExemplaireService;
 import com.bibliotheque.service.TypePretService;
+import com.bibliotheque.model.Notification;
+import com.bibliotheque.service.NotificationService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,15 +36,17 @@ public class ReservationController {
     private final PretLivreService pretLivreService;
     private final ExemplaireService exemplaireService;
     private final TypePretService typePretService;
+    private final NotificationService notificationService;
 
     @Autowired
-    public ReservationController(ReservationService reservationService, AdherentService adherentService, LivreService livreService, PretLivreService pretLivreService, ExemplaireService exemplaireService, TypePretService typePretService) {
+    public ReservationController(ReservationService reservationService, AdherentService adherentService, LivreService livreService, PretLivreService pretLivreService, ExemplaireService exemplaireService, TypePretService typePretService, NotificationService notificationService) {
         this.reservationService = reservationService;
         this.adherentService = adherentService;
         this.livreService = livreService;
         this.pretLivreService = pretLivreService;
         this.exemplaireService = exemplaireService;
         this.typePretService = typePretService;
+        this.notificationService = notificationService;
     }
 
     @GetMapping
@@ -116,29 +120,42 @@ public class ReservationController {
         Optional<Reservation> reservationOpt = reservationService.getReservationById(id);
         if (reservationOpt.isPresent()) {
             Reservation reservation = reservationOpt.get();
+            if (reservation.getDatePret() == null || reservation.getDateFinPret() == null || reservation.getTypePret() == null) {
+                redirectAttributes.addFlashAttribute("error", "Impossible de confirmer la réservation : date de prêt, date de fin ou type de prêt manquant.");
+                return "redirect:/admin/reservations";
+            }
             reservation.setEtatReservation("confirmee");
             reservationService.saveReservation(reservation);
+            // Notifier l'adhérent
+            Notification notif = new Notification();
+            notif.setAdherent(reservation.getAdherent());
+            notif.setTitre("Demande de réservation acceptée");
+            notif.setMessage("Votre demande de réservation pour le livre '" + reservation.getLivre().getTitre() + "' a été acceptée. Un prêt a été créé.");
+            notif.setDateEnvoi(java.time.LocalDateTime.now());
+            notif.setLu(false);
+            notificationService.saveNotification(notif);
             // Création automatique du prêt
             List<Exemplaire> exemplairesDispos = exemplaireService.getExemplairesDisponiblesByLivre(reservation.getLivre());
             if (!exemplairesDispos.isEmpty()) {
                 Exemplaire exemplaire = exemplairesDispos.get(0);
-                List<TypePret> typesPret = typePretService.getAllTypePrets();
-                TypePret typePret = typesPret.isEmpty() ? null : typesPret.get(0);
-                if (typePret != null) {
-                    PretLivre pret = new PretLivre();
-                    pret.setAdherent(reservation.getAdherent());
-                    pret.setExemplaire(exemplaire);
-                    pret.setTypePret(typePret);
-                    pret.setDateDebut(reservation.getDatePret());
+                TypePret typePret = reservation.getTypePret();
+                PretLivre pret = new PretLivre();
+                pret.setAdherent(reservation.getAdherent());
+                pret.setExemplaire(exemplaire);
+                pret.setTypePret(typePret);
+                java.time.LocalDate datePret = reservation.getDatePret() != null ? reservation.getDatePret() : java.time.LocalDate.now();
+                pret.setDateDebut(datePret);
+                pret.setDatePret(datePret);
+                if (reservation.getDateFinPret() != null) {
                     pret.setDateFin(reservation.getDateFinPret());
-                    pret.setEtatPret("actif");
-                    pretLivreService.savePret(pret);
-                    exemplaire.setEtat("en_pret");
-                    exemplaireService.saveExemplaire(exemplaire);
-                    redirectAttributes.addFlashAttribute("success", "Réservation confirmée et prêt créé avec succès");
                 } else {
-                    redirectAttributes.addFlashAttribute("error", "Aucun type de prêt disponible pour créer le prêt.");
+                    pret.setDateFin(java.time.LocalDate.now().plusDays(30)); // Défaut à 30 jours
                 }
+                pret.setEtatPret("en_cours");
+                pretLivreService.savePret(pret);
+                exemplaire.setEtat("en_pret");
+                exemplaireService.saveExemplaire(exemplaire);
+                redirectAttributes.addFlashAttribute("success", "Réservation confirmée et prêt créé avec succès");
             } else {
                 redirectAttributes.addFlashAttribute("error", "Aucun exemplaire disponible pour ce livre.");
             }

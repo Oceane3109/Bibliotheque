@@ -11,6 +11,7 @@ import com.bibliotheque.service.NotificationService;
 import com.bibliotheque.model.Notification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -39,11 +40,15 @@ public class PretLivreServiceImpl implements PretLivreService {
         if (pretLivre.getIdPret() != null) {
             var oldPretOpt = pretLivreRepository.findById(pretLivre.getIdPret());
             if (oldPretOpt.isPresent()) {
-                wasRetard = "retard".equals(oldPretOpt.get().getEtatPret());
+                wasRetard = "en_retard".equals(oldPretOpt.get().getEtatPret());
             }
         }
+        // Détection automatique du retard
+        if (pretLivre.getDateFin() != null && pretLivre.getEtatPret().equals("en_cours") && pretLivre.getDateFin().isBefore(LocalDate.now())) {
+            pretLivre.setEtatPret("en_retard");
+        }
         PretLivre saved = pretLivreRepository.save(pretLivre);
-        if ("retard".equals(saved.getEtatPret()) && !wasRetard) {
+        if ("en_retard".equals(saved.getEtatPret()) && !wasRetard) {
             Notification notif = new Notification();
             notif.setAdherent(saved.getAdherent());
             notif.setTitre("Prêt en retard");
@@ -58,6 +63,11 @@ public class PretLivreServiceImpl implements PretLivreService {
     @Override
     public Optional<PretLivre> getPretById(Long id) {
         return pretLivreRepository.findById(id);
+    }
+
+    @Override
+    public Optional<PretLivre> getPretByIdWithRelations(Long id) {
+        return pretLivreRepository.findByIdWithRelations(id);
     }
 
     @Override
@@ -108,5 +118,90 @@ public class PretLivreServiceImpl implements PretLivreService {
     @Override
     public void deletePret(Long id) {
         pretLivreRepository.deleteById(id);
+    }
+
+    @Override
+    public List<PretLivre> getPretsActifsByAdherent(Adherent adherent) {
+        return pretLivreRepository.findByAdherentAndEtatPret(adherent, "en_cours");
+    }
+
+    @Override
+    public List<PretLivre> getPretsInactifsByAdherent(Adherent adherent) {
+        return pretLivreRepository.findByAdherentAndEtatPret(adherent, "retourne");
+    }
+
+    @Override
+    public List<PretLivre> getAllPretsActifs() {
+        return pretLivreRepository.findByEtatPret("en_cours");
+    }
+
+    @Override
+    public List<PretLivre> getAllPretsInactifs() {
+        return pretLivreRepository.findByEtatPret("retourne");
+    }
+
+    @Override
+    public void marquerPretCommeRetourne(Long idPret, java.time.LocalDate dateRetourEffective) {
+        Optional<PretLivre> pretOpt = pretLivreRepository.findById(idPret);
+        if (pretOpt.isPresent()) {
+            PretLivre pret = pretOpt.get();
+            System.out.println("[DEBUG] Type de prêt lors du retour : " + (pret.getTypePret() != null ? pret.getTypePret().getNomTypePret() : "null"));
+            System.out.println("[DEBUG] Etat du prêt avant retour : " + pret.getEtatPret());
+            pret.setEtatPret("retourne");
+            pret.setActif(false); // Peut être supprimé à terme si non utilisé ailleurs
+            if (dateRetourEffective != null) {
+                pret.setDateRetourEffective(dateRetourEffective);
+            } else {
+                pret.setDateRetourEffective(LocalDate.now());
+            }
+            Adherent adherent = pret.getAdherent();
+            if (pret.getTypePret() != null && pret.getTypePret().getNomTypePret() != null) {
+                String type = pret.getTypePret().getNomTypePret().toLowerCase();
+                // Suppression de la décrémentation du compteur, car le calcul est dynamique
+                // if (type.contains("domicile")) {
+                //     adherentService.decrementerLivresEmpruntesDomicile(adherent.getIdAdherent());
+                // } else if (type.contains("surplace") || type.contains("sur place")) {
+                //     adherentService.decrementerLivresEmpruntesSurPlace(adherent.getIdAdherent());
+                // }
+            }
+            pretLivreRepository.save(pret);
+        }
+    }
+
+    // Pas d'annotation @Override ici car cette méthode délègue à la version avec date
+    public void marquerPretCommeRetourne(Long idPret) {
+        marquerPretCommeRetourne(idPret, null);
+    }
+
+    // Notification automatique 2 jours avant la date de fin de prêt
+    @Scheduled(cron = "0 0 8 * * *") // tous les jours à 8h
+    public void notifierPretsExpirantBientot() {
+        List<PretLivre> pretsActifs = getAllPretsActifs();
+        LocalDate dansDeuxJours = LocalDate.now().plusDays(2);
+        for (PretLivre pret : pretsActifs) {
+            if (pret.getDateFin() != null && pret.getDateFin().isEqual(dansDeuxJours)) {
+                Notification notif = new Notification();
+                notif.setAdherent(pret.getAdherent());
+                notif.setTitre("Prêt arrivant à expiration");
+                notif.setMessage("Votre prêt pour le livre '" + pret.getExemplaire().getLivre().getTitre() + "' expire dans 2 jours.");
+                notif.setDateEnvoi(java.time.LocalDateTime.now());
+                notif.setLu(false);
+                notificationService.saveNotification(notif);
+            }
+        }
+    }
+
+    @Override
+    public int countPretsEnCoursDomicileByAdherent(Adherent adherent) {
+        return (int) pretLivreRepository.findByAdherentAndEtatPret(adherent, "en_cours").stream()
+            .filter(pret -> pret.getTypePret() != null && pret.getTypePret().getNomTypePret() != null && pret.getTypePret().getNomTypePret().toLowerCase().contains("domicile"))
+            .count();
+    }
+
+    @Override
+    public int countPretsEnCoursSurPlaceByAdherent(Adherent adherent) {
+        return (int) pretLivreRepository.findByAdherentAndEtatPret(adherent, "en_cours").stream()
+            .filter(pret -> pret.getTypePret() != null && pret.getTypePret().getNomTypePret() != null && (pret.getTypePret().getNomTypePret().toLowerCase().contains("surplace") || pret.getTypePret().getNomTypePret().toLowerCase().contains("sur place")))
+            .count();
     }
 } 

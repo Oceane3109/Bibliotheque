@@ -14,4 +14,6 @@ public interface UserService {
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
     boolean isAdmin(Long userId);
+    // Ajouté pour notifications admin
+    List<User> getAllAdmins();
 } 

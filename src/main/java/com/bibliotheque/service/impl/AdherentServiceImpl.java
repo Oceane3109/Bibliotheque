@@ -127,7 +127,7 @@ public class AdherentServiceImpl implements AdherentService {
     public void decrementerLivresEmpruntesDomicile(Long adherentId) {
         Adherent adherent = getAdherentById(adherentId)
                 .orElseThrow(() -> new EntityNotFoundException("Adhérent non trouvé avec l'ID: " + adherentId));
-        
+        System.out.println("[DEBUG] Compteur livresEmpruntesDomicile avant décrémentation pour adhérent " + adherentId + " : " + adherent.getLivresEmpruntesDomicile());
         if (adherent.getLivresEmpruntesDomicile() > 0) {
             adherent.setLivresEmpruntesDomicile(adherent.getLivresEmpruntesDomicile() - 1);
             adherentRepository.save(adherent);
@@ -160,5 +160,10 @@ public class AdherentServiceImpl implements AdherentService {
     @Override
     public Optional<Adherent> getAdherentByUserUsername(String username) {
         return userService.getUserByUsername(username).flatMap(this::getAdherentByUser);
+    }
+
+    @Override
+    public Optional<Adherent> getAdherentByUserUsernameWithPrets(String username) {
+        return adherentRepository.findByUserUsernameWithPrets(username);
     }
 } 

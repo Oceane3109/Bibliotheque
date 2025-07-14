@@ -12,4 +12,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
     boolean existsByNomUtilisateur(String nomUtilisateur);
     boolean existsByEmail(String email);
+    // Ajouté pour notifications admin
+    java.util.List<User> findByEstAdminTrue();
 } 

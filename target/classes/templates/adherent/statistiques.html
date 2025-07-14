@@ -72,7 +72,7 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between mb-2">
                             <span>Utilisation</span>
-                            <span th:text="${adherent.livresEmpruntesDomicile + '/' + adherent.maxLivresDomicile}">0/0</span>
+                            <span th:text="${nbDomicileActifs + '/' + adherent.maxLivresDomicile}">0/0</span>
                         </div>
                         <div class="progress mb-3">
                             <div class="progress-bar" 
@@ -82,13 +82,16 @@
                             </div>
                         </div>
                         <small class="text-muted">
-                            <span th:if="${adherent.livresEmpruntesDomicile < adherent.maxLivresDomicile}">
-                                Vous pouvez encore emprunter <span th:text="${adherent.maxLivresDomicile - adherent.livresEmpruntesDomicile}">0</span> livre(s)
+                            <span th:if="${nbDomicileActifs < adherent.maxLivresDomicile}">
+                                Vous pouvez encore emprunter <span th:text="${adherent.maxLivresDomicile - nbDomicileActifs}">0</span> livre(s)
                             </span>
-                            <span th:unless="${adherent.livresEmpruntesDomicile < adherent.maxLivresDomicile}">
+                            <span th:unless="${nbDomicileActifs < adherent.maxLivresDomicile}">
                                 Vous avez atteint votre limite d'emprunts à domicile
                             </span>
                         </small>
+                        <div class="mt-2 text-muted small">
+                            <i class="bi bi-bar-chart"></i> Total historique : <span th:text="${totalDomicile}">0</span> prêts à domicile
+                        </div>
                     </div>
                 </div>
             </div>
@@ -100,7 +103,7 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between mb-2">
                             <span>Utilisation</span>
-                            <span th:text="${adherent.livresEmpruntesSurplace + '/' + adherent.maxLivresSurplace}">0/0</span>
+                            <span th:text="${nbSurPlaceActifs + '/' + adherent.maxLivresSurplace}">0/0</span>
                         </div>
                         <div class="progress mb-3">
                             <div class="progress-bar bg-success" 
@@ -110,13 +113,16 @@
                             </div>
                         </div>
                         <small class="text-muted">
-                            <span th:if="${adherent.livresEmpruntesSurplace < adherent.maxLivresSurplace}">
-                                Vous pouvez encore emprunter <span th:text="${adherent.maxLivresSurplace - adherent.livresEmpruntesSurplace}">0</span> livre(s)
+                            <span th:if="${nbSurPlaceActifs < adherent.maxLivresSurplace}">
+                                Vous pouvez encore emprunter <span th:text="${adherent.maxLivresSurplace - nbSurPlaceActifs}">0</span> livre(s)
                             </span>
-                            <span th:unless="${adherent.livresEmpruntesSurplace < adherent.maxLivresSurplace}">
+                            <span th:unless="${nbSurPlaceActifs < adherent.maxLivresSurplace}">
                                 Vous avez atteint votre limite d'emprunts sur place
                             </span>
                         </small>
+                        <div class="mt-2 text-muted small">
+                            <i class="bi bi-bar-chart"></i> Total historique : <span th:text="${totalSurPlace}">0</span> prêts sur place
+                        </div>
                     </div>
                 </div>
             </div>

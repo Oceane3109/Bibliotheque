@@ -43,7 +43,7 @@ public class AdminDashboardController {
     public String adminDashboard(Model model) {
         model.addAttribute("totalLivres", livreService.getAllLivres().size());
         model.addAttribute("totalAdherents", adherentService.getAllAdherents().size());
-        model.addAttribute("totalPretsActifs", pretLivreService.getPretsByEtat("actif").size());
+        model.addAttribute("totalPretsActifs", pretLivreService.getPretsByEtat("en_cours").size());
         model.addAttribute("totalReservations", reservationService.getAllReservations().size());
         model.addAttribute("totalPenalites", penaliteService.getAllPenalites().size());
         model.addAttribute("totalNotifications", notificationService.getAllNotifications().size());
