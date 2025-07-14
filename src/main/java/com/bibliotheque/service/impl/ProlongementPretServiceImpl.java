@@ -22,7 +22,25 @@ public class ProlongementPretServiceImpl implements ProlongementPretService {
 
     @Override
     public ProlongementPret saveProlongement(ProlongementPret prolongementPret) {
-        return prolongementPretRepository.save(prolongementPret);
+        System.out.println("=== DÉBUT saveProlongement ===");
+        System.out.println("ProlongementPret à sauvegarder:");
+        System.out.println("  - ID: " + prolongementPret.getIdProlongation());
+        System.out.println("  - Prêt ID: " + (prolongementPret.getPretLivre() != null ? prolongementPret.getPretLivre().getIdPret() : "NULL"));
+        System.out.println("  - Date demande: " + prolongementPret.getDateDemande());
+        System.out.println("  - Nouvelle date fin: " + prolongementPret.getNouvelleDateFin());
+        System.out.println("  - État: " + prolongementPret.getEtatProlongation());
+        
+        try {
+            ProlongementPret saved = prolongementPretRepository.save(prolongementPret);
+            System.out.println("Prolongement sauvegardé avec succès, ID: " + saved.getIdProlongation());
+            System.out.println("=== FIN saveProlongement ===");
+            return saved;
+        } catch (Exception e) {
+            System.err.println("Erreur lors de la sauvegarde: " + e.getMessage());
+            e.printStackTrace();
+            System.out.println("=== FIN saveProlongement (ERREUR) ===");
+            throw e;
+        }
     }
 
     @Override
@@ -63,5 +81,15 @@ public class ProlongementPretServiceImpl implements ProlongementPretService {
     @Override
     public List<ProlongementPret> getProlongementsByAdherent(Adherent adherent) {
         return prolongementPretRepository.findByPretLivre_Adherent(adherent);
+    }
+
+    @Override
+    public int getNombreProlongementsApprouvesByAdherent(Adherent adherent) {
+        return prolongementPretRepository.countByPretLivre_AdherentAndEtatProlongation(adherent, "approuvee");
+    }
+
+    @Override
+    public List<ProlongementPret> getAllProlongementsWithRelations() {
+        return prolongementPretRepository.findAllWithRelations();
     }
 } 

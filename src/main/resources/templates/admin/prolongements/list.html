@@ -5,17 +5,19 @@
     <title>Liste des prolongements de prêt</title>
     <link rel="stylesheet" th:href="@{/css/auth.css}" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
 </head>
 <body>
 <div class="container mt-4">
-    <h2>Liste des prolongements de prêt</h2>
+    <h2><i class="bi bi-clock-history"></i> Liste des prolongements de prêt</h2>
     <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-    <a th:href="@{/admin/prolongements/create}" class="btn btn-primary mb-3">Nouveau prolongement</a>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
     <table class="table table-bordered table-hover">
         <thead>
         <tr>
             <th>ID</th>
-            <th>Prêt</th>
+            <th>Adhérent</th>
+            <th>Livre</th>
             <th>Date demande</th>
             <th>Nouvelle date fin</th>
             <th>État</th>
@@ -25,15 +27,35 @@
         <tbody>
         <tr th:each="prolongement : ${prolongements}">
             <td th:text="${prolongement.idProlongation}"></td>
-            <td th:text="${prolongement.pretLivre != null ? prolongement.pretLivre.idPret : ''}"></td>
-            <td th:text="${#dates.format(prolongement.dateDemande, 'dd/MM/yyyy')}"></td>
-            <td th:text="${#dates.format(prolongement.nouvelleDateFin, 'dd/MM/yyyy')}"></td>
-            <td th:text="${prolongement.etatProlongation}"></td>
+            <td th:text="${prolongement.pretLivre.adherent.nom + ' ' + prolongement.pretLivre.adherent.prenom}"></td>
+            <td th:text="${prolongement.pretLivre.exemplaire.livre.titre}"></td>
+            <td th:text="${#temporals.format(prolongement.dateDemande, 'dd/MM/yyyy')}"></td>
+            <td th:text="${#temporals.format(prolongement.nouvelleDateFin, 'dd/MM/yyyy')}"></td>
             <td>
-                <a th:href="@{'/admin/prolongements/edit/' + ${prolongement.idProlongation}}" class="btn btn-sm btn-warning">Modifier</a>
-                <form th:action="@{'/admin/prolongements/delete/' + ${prolongement.idProlongation}}" method="post" style="display:inline-block;">
-                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Supprimer ce prolongement ?');">Supprimer</button>
-                </form>
+                <span th:if="${prolongement.etatProlongation == 'en_attente'}" class="badge bg-warning">En attente</span>
+                <span th:if="${prolongement.etatProlongation == 'approuvee'}" class="badge bg-success">Approuvée</span>
+                <span th:if="${prolongement.etatProlongation == 'refusee'}" class="badge bg-danger">Refusée</span>
+            </td>
+            <td>
+                <!-- Actions pour les prolongements en attente -->
+                <div th:if="${prolongement.etatProlongation == 'en_attente'}">
+                    <form th:action="@{'/admin/prolongements/valider/' + ${prolongement.idProlongation}}" method="post" style="display:inline-block;">
+                        <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Valider cette demande de prolongement ?')">
+                            <i class="bi bi-check-circle"></i> Valider
+                        </button>
+                    </form>
+                    <form th:action="@{'/admin/prolongements/refuser/' + ${prolongement.idProlongation}}" method="post" style="display:inline-block;">
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Refuser cette demande de prolongement ?')">
+                            <i class="bi bi-x-circle"></i> Refuser
+                        </button>
+                    </form>
+                </div>
+                <!-- Actions pour les autres états -->
+                <div th:if="${prolongement.etatProlongation != 'en_attente'}">
+                    <form th:action="@{'/admin/prolongements/delete/' + ${prolongement.idProlongation}}" method="post" style="display:inline-block;">
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Supprimer ce prolongement ?');">Supprimer</button>
+                    </form>
+                </div>
             </td>
         </tr>
         </tbody>

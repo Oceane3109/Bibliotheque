@@ -13,6 +13,8 @@ DELETE FROM users;
 DELETE FROM type_adherent;
 DELETE FROM livres;
 DELETE FROM jours_feries;
+DELETE FROM notes_livres;
+DELETE FROM abonnement;
 
 -- Réinitialisation des séquences
 ALTER SEQUENCE notifications_id_notification_seq RESTART WITH 1;
@@ -29,3 +31,5 @@ ALTER SEQUENCE users_id_user_seq RESTART WITH 1;
 ALTER SEQUENCE type_adherent_id_type_adherent_seq RESTART WITH 1;
 ALTER SEQUENCE livres_id_livre_seq RESTART WITH 1;
 ALTER SEQUENCE jours_feries_id_jour_ferie_seq RESTART WITH 1;
+ALTER SEQUENCE notes_livres_id_seq RESTART WITH 1;
+ALTER SEQUENCE abonnement_id_abonnement_seq RESTART WITH 1;

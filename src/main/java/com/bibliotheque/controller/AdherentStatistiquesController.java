@@ -51,19 +51,23 @@ public class AdherentStatistiquesController {
         adherent.setPenalise(isPenalise);
         
         // Statistiques des prêts
-        var pretsActifs = pretLivreService.getPretsByAdherentAndEtat(adherent, "actif");
-        var pretsEnRetard = pretLivreService.getPretsByAdherentAndEtat(adherent, "retard");
-        var pretsTermines = pretLivreService.getPretsByAdherentAndEtat(adherent, "termine");
+        var pretsActifs = pretLivreService.getPretsByAdherentAndEtat(adherent, "en_cours");
+        var pretsEnRetard = pretLivreService.getPretsByAdherentAndEtat(adherent, "en_retard");
+        var pretsTermines = pretLivreService.getPretsByAdherentAndEtat(adherent, "retourne");
         
         // Statistiques des réservations
         var reservationsEnAttente = reservationService.getReservationsByAdherentAndEtat(adherent, "en_attente");
         var reservationsConfirmees = reservationService.getReservationsByAdherentAndEtat(adherent, "confirmee");
         
         // Calculs des pourcentages
-        double pourcentageDomicile = adherent.getMaxLivresDomicile() > 0 ? 
-            (double) adherent.getLivresEmpruntesDomicile() / adherent.getMaxLivresDomicile() * 100 : 0;
-        double pourcentageSurplace = adherent.getMaxLivresSurplace() > 0 ? 
-            (double) adherent.getLivresEmpruntesSurplace() / adherent.getMaxLivresSurplace() * 100 : 0;
+        long nbDomicileActifs = pretsActifs.stream().filter(pret -> pret.getTypePret() != null && pret.getTypePret().getNomTypePret().equalsIgnoreCase("domicile")).count();
+        long nbSurPlaceActifs = pretsActifs.stream().filter(pret -> pret.getTypePret() != null && (pret.getTypePret().getNomTypePret().equalsIgnoreCase("sur_place") || pret.getTypePret().getNomTypePret().equalsIgnoreCase("sur place"))).count();
+        double pourcentageDomicile = adherent.getMaxLivresDomicile() > 0 ? (double) nbDomicileActifs / adherent.getMaxLivresDomicile() * 100 : 0;
+        double pourcentageSurplace = adherent.getMaxLivresSurplace() > 0 ? (double) nbSurPlaceActifs / adherent.getMaxLivresSurplace() * 100 : 0;
+        // Historique total (tous prêts)
+        var tousPrets = pretLivreService.getPretsByAdherent(adherent);
+        long totalDomicile = tousPrets.stream().filter(pret -> pret.getTypePret() != null && pret.getTypePret().getNomTypePret().equalsIgnoreCase("domicile")).count();
+        long totalSurPlace = tousPrets.stream().filter(pret -> pret.getTypePret() != null && (pret.getTypePret().getNomTypePret().equalsIgnoreCase("sur_place") || pret.getTypePret().getNomTypePret().equalsIgnoreCase("sur place"))).count();
         
         // Statistiques temporelles
         int pretsCeMois = (int) pretsActifs.stream()
@@ -86,6 +90,10 @@ public class AdherentStatistiquesController {
         model.addAttribute("pretsCetteAnnee", pretsCetteAnnee);
         model.addAttribute("notificationsNonLuesCount", 
                           notificationService.getNotificationsNonLuesByAdherent(adherent).size());
+        model.addAttribute("nbDomicileActifs", nbDomicileActifs);
+        model.addAttribute("nbSurPlaceActifs", nbSurPlaceActifs);
+        model.addAttribute("totalDomicile", totalDomicile);
+        model.addAttribute("totalSurPlace", totalSurPlace);
         
         return "adherent/statistiques";
     }

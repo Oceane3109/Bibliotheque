@@ -19,7 +19,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
@@ -42,8 +45,10 @@ public class AdminPretController {
 
     @GetMapping("/list")
     public String listPrets(Model model) {
-        List<PretLivre> prets = pretLivreService.getAllPrets();
-        model.addAttribute("prets", prets);
+        List<PretLivre> pretsActifs = pretLivreService.getAllPretsActifs();
+        List<PretLivre> pretsInactifs = pretLivreService.getAllPretsInactifs();
+        model.addAttribute("pretsActifs", pretsActifs);
+        model.addAttribute("pretsInactifs", pretsInactifs);
         return "admin/prets/list";
     }
 
@@ -107,6 +112,9 @@ public class AdminPretController {
             return "admin/prets/form";
         }
         try {
+            if (pret.getDatePret() == null) {
+                pret.setDatePret(LocalDate.now());
+            }
             pretLivreService.savePret(pret);
             redirectAttributes.addFlashAttribute("success", "Prêt créé avec succès");
             return "redirect:/admin/prets/list";
@@ -122,5 +130,35 @@ public class AdminPretController {
     @GetMapping("")
     public String redirectToList() {
         return "redirect:/admin/prets/list";
+    }
+
+    @RequestMapping(value = "/retourner/{id}", method = {RequestMethod.GET, RequestMethod.POST})
+    public String marquerCommeRetourne(@PathVariable Long id, 
+                                       @RequestParam(value = "dateRetourEffective", required = false) String dateRetourEffectiveStr,
+                                       RedirectAttributes redirectAttributes) {
+        try {
+            java.time.LocalDate dateRetourEffective = null;
+            if (dateRetourEffectiveStr != null && !dateRetourEffectiveStr.isEmpty()) {
+                dateRetourEffective = java.time.LocalDate.parse(dateRetourEffectiveStr);
+            }
+            pretLivreService.marquerPretCommeRetourne(id, dateRetourEffective);
+            redirectAttributes.addFlashAttribute("success", "Livre marqué comme retourné avec succès");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Erreur lors du retour du livre: " + e.getMessage());
+        }
+        return "redirect:/admin/prets/list";
+    }
+
+    @GetMapping("/adherent/{id}")
+    public String listPretsByAdherent(@PathVariable Long id, Model model) {
+        var adherentOpt = adherentService.getAdherentById(id);
+        if (adherentOpt.isEmpty()) {
+            return "redirect:/admin/adherents/list";
+        }
+        Adherent adherent = adherentOpt.get();
+        List<PretLivre> prets = pretLivreService.getPretsByAdherent(adherent);
+        model.addAttribute("adherent", adherent);
+        model.addAttribute("prets", prets);
+        return "admin/prets/list-by-adherent";
     }
 } 

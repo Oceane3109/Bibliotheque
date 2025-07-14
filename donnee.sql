@@ -18,16 +18,7 @@ INSERT INTO adherents (id_user, id_type_adherent, nom, prenom, adresse, email, t
 ((SELECT id_user FROM users WHERE nom_utilisateur = 'jean.dupont'), (SELECT id_type_adherent FROM type_adherent WHERE nom_type = 'étudiant'), 'Dupont', 'Jean', '123 Rue Exemple, Paris', 'jean.dupont@email.com', '0123456789', '2025-07-01', '2000-05-15', 3, 3, 1, 0, 14),
 ((SELECT id_user FROM users WHERE nom_utilisateur = 'marie.curie'), (SELECT id_type_adherent FROM type_adherent WHERE nom_type = 'adulte'), 'Curie', 'Marie', '456 Avenue Test, Paris', 'marie.curie@email.com', '0987654321', '2025-07-01', '1970-11-07', 5, 5, 0, 0, 21);
 
--- Insertion des livres
-INSERT INTO livres (titre, auteur, editeur, annee_publication, isbn, age_minimum) VALUES
-('1984', 'George Orwell', 'Gallimard', 1949, '9782070368228', 16),
-('Les Misérables', 'Victor Hugo', 'Hachette', 1862, '9782011691163', NULL);
-
--- Insertion des exemplaires (sans date_acquisition qui n'existe pas)
-INSERT INTO exemplaires (id_livre, code_exemplaire, etat) VALUES
-((SELECT id_livre FROM livres WHERE titre = '1984'), '1984-001', 'disponible'),
-((SELECT id_livre FROM livres WHERE titre = '1984'), '1984-002', 'disponible'),
-((SELECT id_livre FROM livres WHERE titre = 'Les Misérables'), 'LM-001', 'disponible');
+-- Insertion de livres avec images distantes
 
 -- Insertion des types de prêt
 INSERT INTO types_pret (nom_type_pret, description) VALUES
@@ -40,25 +31,64 @@ INSERT INTO jours_feries (nom, date_feriee, description) VALUES
 ('Noël', '2025-12-25', 'Noël');
 
 -- Insertion d'un prêt (avec date_debut au lieu de date_pret)
-INSERT INTO prets_livre (id_adherent, id_exemplaire, id_type_pret, date_debut, date_fin, etat_pret) VALUES
-((SELECT id_adherent FROM adherents WHERE nom = 'Dupont'), (SELECT id_exemplaire FROM exemplaires WHERE code_exemplaire = '1984-001'), (SELECT id_type_pret FROM types_pret WHERE nom_type_pret = 'domicile'), '2025-07-01', '2025-07-15', 'en_cours');
 
--- Mise à jour de l'état de l'exemplaire
-UPDATE exemplaires SET etat = 'en_pret' WHERE code_exemplaire = '1984-001';
 
--- Insertion d'une réservation (avec date_reservation au lieu de date_pret)
-INSERT INTO reservations (id_adherent, id_livre, date_reservation, etat_reservation) VALUES
-((SELECT id_adherent FROM adherents WHERE nom = 'Curie'), (SELECT id_livre FROM livres WHERE titre = '1984'), '2025-07-16', 'en_attente');
+-- Script pour ajouter la colonne quota_prolongements à la table adherents
+-- Exécuter ces commandes dans PostgreSQL
 
--- Insertion d'une pénalité (avec id_pret_livre au lieu de id_pret)
-INSERT INTO penalites (id_pret_livre, motif, jours_penalite, date_emission) VALUES
-((SELECT id_pret FROM prets_livre WHERE id_adherent = (SELECT id_adherent FROM adherents WHERE nom = 'Dupont')), 'retard', 2, '2025-07-17');
+-- 1. Ajouter la colonne avec une valeur par défaut
+ALTER TABLE adherents ADD COLUMN quota_prolongements INTEGER DEFAULT 2;
 
--- Insertion d'un utilisateur pénalisé
-INSERT INTO users_penalises (id_adherent, date_debut, date_fin, motif, actif) VALUES
-((SELECT id_adherent FROM adherents WHERE nom = 'Dupont'), '2025-07-17', '2025-07-19', 'Retard de 2 jours', TRUE);
+-- 2. Mettre à jour les valeurs NULL avec la valeur par défaut
+UPDATE adherents SET quota_prolongements = 2 WHERE quota_prolongements IS NULL;
 
--- Insertion d'une notification
-INSERT INTO notifications (id_adherent, titre, message, date_envoi, lu) VALUES
-((SELECT id_adherent FROM adherents WHERE nom = 'Dupont'), 'Prêt en retard', 'Vous avez un prêt en retard.', '2025-07-17 10:00:00', FALSE),
-((SELECT id_adherent FROM adherents WHERE nom = 'Curie'), 'Réservation disponible', 'Votre réservation est disponible.', '2025-07-18 09:00:00', FALSE);
+-- 3. Rendre la colonne NOT NULL après avoir mis à jour toutes les valeurs
+ALTER TABLE adherents ALTER COLUMN quota_prolongements SET NOT NULL;
+
+-- 4. Vérifier que la colonne a été ajoutée correctement
+SELECT id_adherent, nom, prenom, quota_prolongements FROM adherents LIMIT 5;
+
+
+-- Ajoute la colonne si ce n'est pas déjà fait
+ALTER TABLE livres ADD COLUMN IF NOT EXISTS image_url VARCHAR(500);
+
+-- Insertion de livres avec des images distantes fiables
+INSERT INTO livres (titre, auteur, editeur, annee_publication, isbn, age_minimum, image_url) VALUES
+('Le Petit Prince', 'Antoine de Saint-Exupéry', 'Gallimard', 1943, '9782070612758', 7, 'https://upload.wikimedia.org/wikipedia/commons/0/05/Littleprince.JPG'),
+('Harry Potter à l''école des sorciers', 'J.K. Rowling', 'Gallimard Jeunesse', 1998, '9782070643028', 9, 'https://covers.openlibrary.org/b/isbn/9782070643028-L.jpg'),
+('L''Étranger', 'Albert Camus', 'Gallimard', 1942, '9782070360024', 15, 'https://covers.openlibrary.org/b/isbn/9782070360024-L.jpg'),
+('1984', 'George Orwell', 'Gallimard', 1949, '9782070368228', 16, 'https://covers.openlibrary.org/b/isbn/9782070368228-L.jpg'),
+('Les Misérables', 'Victor Hugo', 'Hachette', 1862, '9782011691163', 12, 'https://covers.openlibrary.org/b/isbn/9782011691163-L.jpg');
+
+-- Insertion d'exemplaires pour chaque livre
+
+-- Le Petit Prince
+INSERT INTO exemplaires (id_livre, code_exemplaire, etat)
+VALUES
+((SELECT id_livre FROM livres WHERE titre = 'Le Petit Prince'), 'LPP-001', 'disponible'),
+((SELECT id_livre FROM livres WHERE titre = 'Le Petit Prince'), 'LPP-002', 'disponible');
+
+-- Harry Potter à l'école des sorciers
+INSERT INTO exemplaires (id_livre, code_exemplaire, etat)
+VALUES
+((SELECT id_livre FROM livres WHERE titre = 'Harry Potter à l''école des sorciers'), 'HP1-001', 'disponible'),
+((SELECT id_livre FROM livres WHERE titre = 'Harry Potter à l''école des sorciers'), 'HP1-002', 'disponible'),
+((SELECT id_livre FROM livres WHERE titre = 'Harry Potter à l''école des sorciers'), 'HP1-003', 'disponible');
+
+-- L'Étranger
+INSERT INTO exemplaires (id_livre, code_exemplaire, etat)
+VALUES
+((SELECT id_livre FROM livres WHERE titre = 'L''Étranger'), 'ETR-001', 'disponible'),
+((SELECT id_livre FROM livres WHERE titre = 'L''Étranger'), 'ETR-002', 'disponible');
+
+-- 1984
+INSERT INTO exemplaires (id_livre, code_exemplaire, etat)
+VALUES
+((SELECT id_livre FROM livres WHERE titre = '1984'), 'NIN-001', 'disponible'),
+((SELECT id_livre FROM livres WHERE titre = '1984'), 'NIN-002', 'disponible');
+
+-- Les Misérables
+INSERT INTO exemplaires (id_livre, code_exemplaire, etat)
+VALUES
+((SELECT id_livre FROM livres WHERE titre = 'Les Misérables'), 'LM-001', 'disponible'),
+((SELECT id_livre FROM livres WHERE titre = 'Les Misérables'), 'LM-002', 'disponible');

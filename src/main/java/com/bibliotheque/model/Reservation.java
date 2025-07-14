@@ -26,6 +26,10 @@ public class Reservation {
     @JoinColumn(name = "id_livre", nullable = false)
     private Livre livre;
 
+    @ManyToOne
+    @JoinColumn(name = "id_type_pret", nullable = false)
+    private TypePret typePret;
+
     @NotNull(message = "La date de réservation est obligatoire")
     @Column(name = "date_reservation", nullable = false)
     private LocalDate dateReservation;
@@ -33,10 +37,12 @@ public class Reservation {
     @Column(name = "date_disponibilite")
     private LocalDate dateDisponibilite;
 
-    @Column(name = "date_pret")
+    @NotNull(message = "La date de prêt est obligatoire")
+    @Column(name = "date_pret", nullable = false)
     private LocalDate datePret;
 
-    @Column(name = "date_fin_pret")
+    @NotNull(message = "La date de fin de prêt est obligatoire")
+    @Column(name = "date_fin_pret", nullable = false)
     private LocalDate dateFinPret;
 
     @NotBlank(message = "L'état de la réservation est obligatoire")
@@ -66,6 +72,13 @@ public class Reservation {
 
     public void setLivre(Livre livre) {
         this.livre = livre;
+    }
+
+    public TypePret getTypePret() {
+        return typePret;
+    }
+    public void setTypePret(TypePret typePret) {
+        this.typePret = typePret;
     }
 
     public LocalDate getDateReservation() {

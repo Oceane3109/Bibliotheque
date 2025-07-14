@@ -53,6 +53,9 @@ public class Livre {
     @Column(name = "image_donnees")
     private byte[] imageDonnees;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @OneToMany(mappedBy = "livre", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Exemplaire> exemplaires = new ArrayList<>();
 
@@ -138,6 +141,13 @@ public class Livre {
 
     public void setImageDonnees(byte[] imageDonnees) {
         this.imageDonnees = imageDonnees;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public List<Exemplaire> getExemplaires() {

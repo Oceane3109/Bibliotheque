@@ -16,4 +16,6 @@ public interface ProlongementPretService {
     Optional<ProlongementPret> getDernierProlongementPourPret(PretLivre pretLivre);
     void deleteProlongement(Long id);
     List<ProlongementPret> getProlongementsByAdherent(Adherent adherent);
+    int getNombreProlongementsApprouvesByAdherent(Adherent adherent);
+    List<ProlongementPret> getAllProlongementsWithRelations();
 } 
