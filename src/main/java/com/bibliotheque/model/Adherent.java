@@ -77,6 +77,10 @@ public class Adherent {
     @Column(name = "duree_pret", nullable = false)
     private Integer dureePret = 14;
 
+    @Min(value = 0, message = "Le quota de prolongements doit être positif")
+    @Column(name = "quota_prolongements", nullable = false)
+    private Integer quotaProlongements = 2;
+
     @OneToMany(mappedBy = "adherent")
     private List<PretLivre> prets = new ArrayList<>();
 
@@ -205,6 +209,14 @@ public class Adherent {
 
     public void setDureePret(Integer dureePret) {
         this.dureePret = dureePret;
+    }
+
+    public Integer getQuotaProlongements() {
+        return quotaProlongements;
+    }
+
+    public void setQuotaProlongements(Integer quotaProlongements) {
+        this.quotaProlongements = quotaProlongements;
     }
 
     public List<PretLivre> getPrets() {

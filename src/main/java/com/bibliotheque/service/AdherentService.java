@@ -29,4 +29,5 @@ public interface AdherentService {
     boolean isPenalise(Long adherentId);
 
     Optional<Adherent> getAdherentByUserUsername(String username);
+    Optional<Adherent> getAdherentByUserUsernameWithPrets(String username);
 } 

@@ -9,7 +9,7 @@
 <body>
 <div class="container mt-4">
     <h2>Demande de prolongement de prêt</h2>
-    <form th:action="@{'/demande-prolongement/' + ${prolongementPret.pretLivre.idPret}}" th:object="${prolongementPret}" method="post">
+    <form th:action="@{'/demande-prolongement/' + ${pretId}}" th:object="${prolongementPret}" method="post">
         <div class="mb-3">
             <label for="dateDemande" class="form-label">Date de demande</label>
             <input type="date" class="form-control" id="dateDemande" th:field="*{dateDemande}" required />

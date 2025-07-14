@@ -51,6 +51,14 @@
                         </div>
                     </div>
                 </div>
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <div class="alert alert-info mb-0" role="alert">
+                            La durée de votre réservation ne compte que les jours où la bibliothèque est ouverte.<br>
+                            <strong>Les dimanches et jours fériés ne sont pas pris en compte</strong> dans le calcul de la durée maximale autorisée.
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="col-md-4">
                 <div class="card">
@@ -86,17 +94,27 @@
                         <!-- Réservation -->
                         <div th:if="${#lists.isEmpty(exemplairesDisponibles)}" class="mb-3">
                             <h6>Réserver ce livre</h6>
-                            <form th:action="@{/adherent/reserver/{id}(id=${livre.idLivre})}" method="post">
+                            <form th:action="@{/adherent/reserver/{id}(id=${livre.idLivre})}" method="post" id="reservationForm">
                                 <div class="mb-2">
                                     <label class="form-label">Date de prêt souhaitée :</label>
-                                    <input type="date" name="datePret" class="form-control" required 
+                                    <input type="date" name="datePret" id="datePret" required 
                                            th:min="${#temporals.format(#temporals.createToday(), 'yyyy-MM-dd')}">
                                 </div>
                                 <div class="mb-2">
                                     <label class="form-label">Date de retour souhaitée :</label>
-                                    <input type="date" name="dateFinPret" class="form-control" required 
+                                    <input type="date" name="dateFinPret" id="dateFinPret" required 
                                            th:min="${#temporals.format(#temporals.createToday(), 'yyyy-MM-dd')}">
                                 </div>
+                                <div class="mb-2">
+                                    <label class="form-label">Type de prêt :</label>
+                                    <select name="typePretId" class="form-select" required>
+                                        <option value="">Choisir un type</option>
+                                        <option th:each="type : ${typesPret}"
+                                                th:value="${type.idTypePret}"
+                                                th:text="${type.nomTypePret}">Type</option>
+                                    </select>
+                                </div>
+                                <div id="alerteDuree" class="alert alert-danger d-none" role="alert"></div>
                                 <button type="submit" class="btn btn-warning btn-sm">
                                     <i class="bi bi-bookmark"></i> Réserver
                                 </button>
@@ -149,8 +167,8 @@
                             <h5 class="mb-0">Vos limites de prêt</h5>
                         </div>
                         <div class="card-body">
-                            <p><strong>Prêts à domicile :</strong> <span th:text="${adherent.livresEmpruntesDomicile}">0</span> / <span th:text="${adherent.maxLivresDomicile}">3</span></p>
-                            <p><strong>Prêts sur place :</strong> <span th:text="${adherent.livresEmpruntesSurplace}">0</span> / <span th:text="${adherent.maxLivresSurplace}">3</span></p>
+                            <p><strong>Prêts à domicile :</strong> <span th:text="${nbDomicileActifs}">0</span> / <span th:text="${adherent.maxLivresDomicile}">3</span></p>
+                            <p><strong>Prêts sur place :</strong> <span th:text="${nbSurPlaceActifs}">0</span> / <span th:text="${adherent.maxLivresSurplace}">3</span></p>
                             <p><strong>Durée de prêt :</strong> <span th:text="${adherent.dureePret}">14</span> jours</p>
                         </div>
                     </div>
@@ -261,5 +279,67 @@
             }
         });
     </script>
+    <script>
+        // Liste des jours fériés au format yyyy-MM-dd injectée par le backend
+        const joursFeries = /*[[${joursFeriesIso}]]*/ [];
+    </script>
+    <script>
+// Validation JS de la durée de réservation (jours ouvrés)
+(function() {
+    const form = document.getElementById('reservationForm');
+    if (!form) return;
+    const datePretInput = document.getElementById('datePret');
+    const dateFinPretInput = document.getElementById('dateFinPret');
+    const alerte = document.getElementById('alerteDuree');
+    const dureeMax = /*[[${adherent.dureePret}]]*/ 14;
+
+    // Helper pour savoir si une date (au format yyyy-MM-dd) est un jour férié
+    function isJourFerie(dateStr) {
+        return joursFeries.includes(dateStr);
+    }
+
+    // Compte les jours ouvrés (hors dimanches et jours fériés) entre deux dates incluses
+    function countJoursOuvres(d1, d2) {
+        let count = 0;
+        let d = new Date(d1.getTime());
+        while (d <= d2) {
+            const day = d.getDay(); // 0=dimanche, 6=samedi
+            const iso = d.toISOString().slice(0,10);
+            if (day !== 0 && !isJourFerie(iso)) {
+                count++;
+            }
+            d.setDate(d.getDate() + 1);
+        }
+        return count;
+    }
+
+    function checkDuree() {
+        const datePret = datePretInput.value;
+        const dateFinPret = dateFinPretInput.value;
+        if (datePret && dateFinPret) {
+            const d1 = new Date(datePret);
+            const d2 = new Date(dateFinPret);
+            const joursOuvres = countJoursOuvres(d1, d2);
+            if (joursOuvres > dureeMax) {
+                alerte.textContent = `La durée maximale de prêt autorisée (hors dimanches et jours fériés) est de ${dureeMax} jours ouvrés. Veuillez choisir une date de retour plus proche.`;
+                alerte.classList.remove('d-none');
+                return false;
+            } else {
+                alerte.classList.add('d-none');
+            }
+        } else {
+            alerte.classList.add('d-none');
+        }
+        return true;
+    }
+    datePretInput.addEventListener('change', checkDuree);
+    dateFinPretInput.addEventListener('change', checkDuree);
+    form.addEventListener('submit', function(e) {
+        if (!checkDuree()) {
+            e.preventDefault();
+        }
+    });
+})();
+</script>
 </body>
 </html> 

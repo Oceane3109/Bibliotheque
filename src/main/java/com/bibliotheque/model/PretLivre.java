@@ -45,7 +45,10 @@ public class PretLivre {
 
     @NotBlank(message = "L'état du prêt est obligatoire")
     @Column(name = "etat_pret", nullable = false, length = 50)
-    private String etatPret; // en_cours, retourne, en_retard
+    private String etatPret; // 'en_cours', 'retourne', 'en_retard' uniquement. Le champ 'actif' est obsolète.
+
+    @Column(name = "actif", nullable = false)
+    private Boolean actif = true;
 
     @OneToMany(mappedBy = "pretLivre")
     private List<ProlongementPret> prolongements = new ArrayList<>();
@@ -55,6 +58,10 @@ public class PretLivre {
 
     @OneToOne(mappedBy = "pretLivre", cascade = CascadeType.ALL)
     private RetourLivre retourLivre;
+
+    @NotNull(message = "La date du prêt est obligatoire")
+    @Column(name = "date_pret", nullable = false)
+    private LocalDate datePret;
 
     // Getters et Setters
     public Long getIdPret() {
@@ -121,6 +128,14 @@ public class PretLivre {
         this.etatPret = etatPret;
     }
 
+    public Boolean getActif() {
+        return actif;
+    }
+
+    public void setActif(Boolean actif) {
+        this.actif = actif;
+    }
+
     public List<ProlongementPret> getProlongements() {
         return prolongements;
     }
@@ -143,6 +158,14 @@ public class PretLivre {
 
     public void setRetourLivre(RetourLivre retourLivre) {
         this.retourLivre = retourLivre;
+    }
+
+    public LocalDate getDatePret() {
+        return datePret;
+    }
+
+    public void setDatePret(LocalDate datePret) {
+        this.datePret = datePret;
     }
 
     // Méthodes utilitaires

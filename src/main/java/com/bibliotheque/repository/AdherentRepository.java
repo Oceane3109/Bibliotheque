@@ -20,4 +20,7 @@ public interface AdherentRepository extends JpaRepository<Adherent, Long> {
     
     @Query("SELECT a FROM Adherent a WHERE a.livresEmpruntesDomicile > 0 OR a.livresEmpruntesSurplace > 0")
     List<Adherent> findAllWithActivePrets();
+
+    @Query("SELECT a FROM Adherent a LEFT JOIN FETCH a.prets WHERE a.user.nomUtilisateur = :username")
+    Optional<Adherent> findByUserUsernameWithPrets(String username);
 } 

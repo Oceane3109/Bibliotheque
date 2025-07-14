@@ -2,6 +2,7 @@ package com.bibliotheque.controller;
 
 import com.bibliotheque.model.ProlongementPret;
 import com.bibliotheque.model.PretLivre;
+import com.bibliotheque.model.Adherent;
 import com.bibliotheque.service.ProlongementPretService;
 import com.bibliotheque.service.PretLivreService;
 import jakarta.validation.Valid;
@@ -31,63 +32,68 @@ public class ProlongementPretController {
 
     @GetMapping
     public String listProlongements(Model model) {
-        List<ProlongementPret> prolongements = prolongementPretService.getAllProlongements();
+        List<ProlongementPret> prolongements = prolongementPretService.getAllProlongementsWithRelations();
         model.addAttribute("prolongements", prolongements);
         return "admin/prolongements/list";
-    }
-
-    @GetMapping("/create")
-    public String showCreateForm(Model model) {
-        model.addAttribute("prolongementPret", new ProlongementPret());
-        model.addAttribute("prets", pretLivreService.getAllPrets());
-        return "admin/prolongements/form";
-    }
-
-    @PostMapping("/create")
-    public String createProlongement(@Valid @ModelAttribute("prolongementPret") ProlongementPret prolongementPret,
-                                     BindingResult result,
-                                     Model model,
-                                     RedirectAttributes redirectAttributes) {
-        if (result.hasErrors()) {
-            model.addAttribute("prets", pretLivreService.getAllPrets());
-            return "admin/prolongements/form";
-        }
-        prolongementPretService.saveProlongement(prolongementPret);
-        redirectAttributes.addFlashAttribute("success", "Prolongement enregistré avec succès");
-        return "redirect:/admin/prolongements";
-    }
-
-    @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable Long id, Model model) {
-        Optional<ProlongementPret> prolongementOpt = prolongementPretService.getProlongementById(id);
-        if (prolongementOpt.isEmpty()) {
-            return "redirect:/admin/prolongements";
-        }
-        model.addAttribute("prolongementPret", prolongementOpt.get());
-        model.addAttribute("prets", pretLivreService.getAllPrets());
-        return "admin/prolongements/form";
-    }
-
-    @PostMapping("/edit/{id}")
-    public String updateProlongement(@PathVariable Long id,
-                                     @Valid @ModelAttribute("prolongementPret") ProlongementPret prolongementPret,
-                                     BindingResult result,
-                                     Model model,
-                                     RedirectAttributes redirectAttributes) {
-        if (result.hasErrors()) {
-            model.addAttribute("prets", pretLivreService.getAllPrets());
-            return "admin/prolongements/form";
-        }
-        prolongementPret.setIdProlongation(id);
-        prolongementPretService.saveProlongement(prolongementPret);
-        redirectAttributes.addFlashAttribute("success", "Prolongement modifié avec succès");
-        return "redirect:/admin/prolongements";
     }
 
     @PostMapping("/delete/{id}")
     public String deleteProlongement(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         prolongementPretService.deleteProlongement(id);
         redirectAttributes.addFlashAttribute("success", "Prolongement supprimé avec succès");
+        return "redirect:/admin/prolongements";
+    }
+
+    @PostMapping("/valider/{id}")
+    public String validerProlongement(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        Optional<ProlongementPret> prolongementOpt = prolongementPretService.getProlongementById(id);
+        if (prolongementOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Prolongement non trouvé");
+            return "redirect:/admin/prolongements";
+        }
+        ProlongementPret prolongement = prolongementOpt.get();
+        if (!"en_attente".equals(prolongement.getEtatProlongation())) {
+            redirectAttributes.addFlashAttribute("error", "Cette demande a déjà été traitée");
+            return "redirect:/admin/prolongements";
+        }
+        // Vérifier le quota de l'adhérent
+        Adherent adherent = prolongement.getPretLivre().getAdherent();
+        int prolongementsApprouves = prolongementPretService.getNombreProlongementsApprouvesByAdherent(adherent);
+        if (prolongementsApprouves >= adherent.getQuotaProlongements()) {
+            redirectAttributes.addFlashAttribute("error", "L'adhérent a utilisé tout son quota de prolongements");
+            return "redirect:/admin/prolongements";
+        }
+        // Marquer le prolongement comme approuvé
+        prolongement.setEtatProlongation("approuvee");
+        prolongementPretService.saveProlongement(prolongement);
+        // Mettre à jour la date de fin du prêt existant
+        PretLivre pret = prolongement.getPretLivre();
+        pret.setDateFin(prolongement.getNouvelleDateFin());
+        pret.setEtatPret("en_cours"); // Toujours en cours après prolongement
+        pretLivreService.savePret(pret);
+        redirectAttributes.addFlashAttribute("success", "Prolongement approuvé et date de retour mise à jour");
+        return "redirect:/admin/prolongements";
+    }
+
+    @PostMapping("/refuser/{id}")
+    public String refuserProlongement(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        Optional<ProlongementPret> prolongementOpt = prolongementPretService.getProlongementById(id);
+        if (prolongementOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Prolongement non trouvé");
+            return "redirect:/admin/prolongements";
+        }
+        
+        ProlongementPret prolongement = prolongementOpt.get();
+        if (!"en_attente".equals(prolongement.getEtatProlongation())) {
+            redirectAttributes.addFlashAttribute("error", "Cette demande a déjà été traitée");
+            return "redirect:/admin/prolongements";
+        }
+        
+        // Marquer le prolongement comme refusé
+        prolongement.setEtatProlongation("refusee");
+        prolongementPretService.saveProlongement(prolongement);
+        
+        redirectAttributes.addFlashAttribute("success", "Prolongement refusé");
         return "redirect:/admin/prolongements";
     }
 } 
