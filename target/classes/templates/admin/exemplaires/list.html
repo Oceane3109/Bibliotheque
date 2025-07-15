@@ -13,8 +13,8 @@
                 <h1>Exemplaires de <span th:text="${livre.titre}">Titre</span></h1>
             </div>
             <div class="col text-end">
-                <a th:href="@{/livres/{id}(id=${livre.idLivre})}" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left"></i> Retour au livre
+                <a th:href="@{/admin/livres/{id}(id=${livre.idLivre})}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Retour detail
                 </a>
                 <a th:href="@{/admin/exemplaires/livre/{id}/create(id=${livre.idLivre})}" class="btn btn-primary ms-2">
                     <i class="bi bi-plus-circle"></i> Ajouter un exemplaire

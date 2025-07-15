@@ -1,5 +1,7 @@
 package com.bibliotheque.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.NoArgsConstructor;
@@ -47,9 +49,11 @@ public class Livre {
     private String imageUrl;
 
     @OneToMany(mappedBy = "livre", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Exemplaire> exemplaires = new ArrayList<>();
 
     @OneToMany(mappedBy = "livre")
+    @JsonIgnore
     private List<Reservation> reservations = new ArrayList<>();
 
     // Getters et Setters

@@ -218,6 +218,13 @@ public class AdherentPretController {
             return "redirect:/adherent/mes-prets";
         }
         
+        // Vérifier abonnement actif
+        boolean abonneActif = abonnementService.getAbonnementActifByAdherent(adherent).isPresent();
+        if (!abonneActif) {
+            redirectAttributes.addFlashAttribute("error", "Vous devez avoir un abonnement actif pour demander un prolongement.");
+            return "redirect:/adherent/mes-prets";
+        }
+        
         System.out.println("Adhérent: " + adherent.getNom() + " " + adherent.getPrenom());
         System.out.println("Quota actuel: " + adherent.getQuotaProlongements());
         
@@ -302,19 +309,23 @@ public class AdherentPretController {
             return "redirect:/adherent/livre/" + exemplaire.getLivre().getIdLivre();
         }
         
-        // Vérifier les limites de prêt
+        // Vérifier abonnement actif
         boolean abonneActif = abonnementService.getAbonnementActifByAdherent(adherent).isPresent();
         if (!abonneActif) {
-            if (typePret.getNomTypePret().equalsIgnoreCase("domicile")) {
-                if (pretLivreService.countPretsEnCoursDomicileByAdherent(adherent) >= adherent.getMaxLivresDomicile()) {
-                    redirectAttributes.addFlashAttribute("error", "Vous avez atteint votre limite de prêts à domicile");
-                    return "redirect:/adherent/livre/" + exemplaire.getLivre().getIdLivre();
-                }
-            } else if (typePret.getNomTypePret().equalsIgnoreCase("sur_place")) {
-                if (pretLivreService.countPretsEnCoursSurPlaceByAdherent(adherent) >= adherent.getMaxLivresSurplace()) {
-                    redirectAttributes.addFlashAttribute("error", "Vous avez atteint votre limite de prêts sur place");
-                    return "redirect:/adherent/livre/" + exemplaire.getLivre().getIdLivre();
-                }
+            redirectAttributes.addFlashAttribute("error", "Vous devez avoir un abonnement actif pour emprunter des livres.");
+            return "redirect:/adherent/livre/" + exemplaire.getLivre().getIdLivre();
+        }
+        
+        // Vérifier les quotas (toujours appliqué)
+        if (typePret.getNomTypePret().equalsIgnoreCase("domicile")) {
+            if (pretLivreService.countPretsEnCoursDomicileByAdherent(adherent) >= adherent.getMaxLivresDomicile()) {
+                redirectAttributes.addFlashAttribute("error", "Vous avez atteint votre limite de prêts à domicile");
+                return "redirect:/adherent/livre/" + exemplaire.getLivre().getIdLivre();
+            }
+        } else if (typePret.getNomTypePret().equalsIgnoreCase("sur_place")) {
+            if (pretLivreService.countPretsEnCoursSurPlaceByAdherent(adherent) >= adherent.getMaxLivresSurplace()) {
+                redirectAttributes.addFlashAttribute("error", "Vous avez atteint votre limite de prêts sur place");
+                return "redirect:/adherent/livre/" + exemplaire.getLivre().getIdLivre();
             }
         }
         
@@ -369,6 +380,7 @@ public class AdherentPretController {
         var adherentOpt = adherentService.getAdherentByUser(userOpt.get());
         if (adherentOpt.isEmpty()) return "redirect:/login";
         Adherent adherent = adherentOpt.get();
+        
         Optional<Livre> livreOpt = livreService.getLivreById(livreId);
         if (livreOpt.isEmpty()) {
             redirectAttributes.addFlashAttribute("error", "Livre non trouvé");
@@ -385,6 +397,24 @@ public class AdherentPretController {
         if (typePretOpt.isEmpty()) {
             redirectAttributes.addFlashAttribute("error", "Type de prêt invalide");
             return "redirect:/adherent/livre/" + livreId;
+        }
+        // Vérifier abonnement actif
+        boolean abonneActif = abonnementService.getAbonnementActifByAdherent(adherent).isPresent();
+        if (!abonneActif) {
+            redirectAttributes.addFlashAttribute("error", "Vous devez avoir un abonnement actif pour faire des réservations.");
+            return "redirect:/adherent/livre/" + livreId;
+        }
+        // Vérifier le quota de prêts en cours
+        if (typePretOpt.get().getNomTypePret().equalsIgnoreCase("domicile")) {
+            if (pretLivreService.countPretsEnCoursDomicileByAdherent(adherent) >= adherent.getMaxLivresDomicile()) {
+                redirectAttributes.addFlashAttribute("error", "Vous avez atteint votre limite de prêts à domicile.");
+                return "redirect:/adherent/livre/" + livreId;
+            }
+        } else if (typePretOpt.get().getNomTypePret().equalsIgnoreCase("sur_place")) {
+            if (pretLivreService.countPretsEnCoursSurPlaceByAdherent(adherent) >= adherent.getMaxLivresSurplace()) {
+                redirectAttributes.addFlashAttribute("error", "Vous avez atteint votre limite de prêts sur place.");
+                return "redirect:/adherent/livre/" + livreId;
+            }
         }
         // Validation de la durée de réservation
         LocalDate datePret = LocalDate.parse(datePretStr);

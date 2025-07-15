@@ -15,6 +15,5 @@ public interface AbonnementRepository extends JpaRepository<Abonnement, Long> {
     Optional<Abonnement> findFirstByAdherentAndStatutOrderByDateFinDesc(Adherent adherent, String statut);
     List<Abonnement> findByStatut(String statut);
     List<Abonnement> findByStatutAndDateFinBefore(String statut, LocalDate date);
-    // Pour trouver l'abonnement actif
     Optional<Abonnement> findFirstByAdherentAndStatutAndDateFinAfterOrderByDateFinDesc(Adherent adherent, String statut, LocalDate date);
 } 

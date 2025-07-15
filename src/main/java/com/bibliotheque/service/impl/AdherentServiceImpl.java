@@ -166,4 +166,19 @@ public class AdherentServiceImpl implements AdherentService {
     public Optional<Adherent> getAdherentByUserUsernameWithPrets(String username) {
         return adherentRepository.findByUserUsernameWithPrets(username);
     }
+
+    @Override
+    public Optional<Adherent> getAdherentByIdWithPrets(Long id) {
+        return adherentRepository.findByIdWithPrets(id);
+    }
+
+    @Override
+    public int countProlongementsByAdherentId(Long adherentId) {
+        return adherentRepository.countProlongementsByAdherentId(adherentId);
+    }
+
+    @Override
+    public int countReservationsByAdherentId(Long adherentId) {
+        return adherentRepository.countReservationsByAdherentId(adherentId);
+    }
 } 

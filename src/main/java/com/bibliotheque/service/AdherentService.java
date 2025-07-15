@@ -30,4 +30,7 @@ public interface AdherentService {
 
     Optional<Adherent> getAdherentByUserUsername(String username);
     Optional<Adherent> getAdherentByUserUsernameWithPrets(String username);
+    Optional<Adherent> getAdherentByIdWithPrets(Long id);
+    int countProlongementsByAdherentId(Long adherentId);
+    int countReservationsByAdherentId(Long adherentId);
 } 

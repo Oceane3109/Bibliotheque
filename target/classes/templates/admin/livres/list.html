@@ -46,6 +46,7 @@
                                 <th>ISBN</th>
                                 <th>Année</th>
                                 <th>Exemplaires</th>
+                                <th>Disponibles</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -67,6 +68,7 @@
                                         <li th:each="ex : ${livre.exemplaires}" th:text="${ex.codeExemplaire} + ' (' + ex.etat + ')' "></li>
                                     </ul>
                                 </td>
+                                <td th:text="${exemplairesDisponibles[livre.idLivre]}"></td>
                                 <td>
                                     <div class="btn-group" role="group">
                                         <a th:href="@{'/admin/livres/' + ${livre.idLivre}}" class="btn btn-sm btn-outline-primary" title="Voir les détails">
@@ -88,8 +90,8 @@
         </div>
     </div>
     <div class="text-center my-4">
-        <a href="/admin/dashboard" class="btn btn-secondary">
-            <i class="bi bi-arrow-left"></i> Retour au dashboard
+        <a th:href="@{/admin/dashboard}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Retour 
         </a>
     </div>
 

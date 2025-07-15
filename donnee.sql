@@ -58,7 +58,7 @@ INSERT INTO livres (titre, auteur, editeur, annee_publication, isbn, age_minimum
 ('Harry Potter à l''école des sorciers', 'J.K. Rowling', 'Gallimard Jeunesse', 1998, '9782070643028', 9, 'https://covers.openlibrary.org/b/isbn/9782070643028-L.jpg'),
 ('L''Étranger', 'Albert Camus', 'Gallimard', 1942, '9782070360024', 15, 'https://covers.openlibrary.org/b/isbn/9782070360024-L.jpg'),
 ('1984', 'George Orwell', 'Gallimard', 1949, '9782070368228', 16, 'https://covers.openlibrary.org/b/isbn/9782070368228-L.jpg'),
-('Les Misérables', 'Victor Hugo', 'Hachette', 1862, '9782011691163', 12, 'https://covers.openlibrary.org/b/isbn/9782011691163-L.jpg');
+('Les Misérables', 'Victor Hugo', 'Hachette', 1862, '9782011691163', 12, 'https://covers.openlibrary.org/b/id/11156361-L.jpg');
 
 -- Insertion d'exemplaires pour chaque livre
 
