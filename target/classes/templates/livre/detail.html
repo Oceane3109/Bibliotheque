@@ -41,9 +41,8 @@
                 <div class="card mb-4">
                     <div class="card-body">
                         <div class="image-container">
-                            <img th:if="${livre.hasImage()}" 
-                                 th:src="@{/livres/image/{id}(id=${livre.idLivre})}"
-                                 class="book-image" alt="Couverture du livre">
+                            <!-- J'affiche la couverture du livre uniquement via imageUrl -->
+                            <img th:src="${livre.imageUrl}" alt="Couverture du livre" class="img-fluid" />
                             <div th:unless="${livre.hasImage()}" 
                                  class="d-flex align-items-center justify-content-center h-100">
                                 <i class="bi bi-book" style="font-size: 5rem;"></i>
