@@ -83,7 +83,6 @@ public class LivreController {
     @PostMapping("/admin/create")
     public String createLivre(@Valid @ModelAttribute("livre") Livre livre,
                             BindingResult result,
-                            @RequestParam(required = false) MultipartFile image,
                             Model model,
                             RedirectAttributes redirectAttributes) {
         if (livre.getIsbn() != null && !livre.getIsbn().isEmpty() && livreService.existsByIsbn(livre.getIsbn())) {
@@ -95,10 +94,10 @@ public class LivreController {
         }
 
         try {
-            livreService.saveLivreWithImage(livre, image);
+            livreService.saveLivre(livre);
             redirectAttributes.addFlashAttribute("success", "Livre ajouté avec succès");
-        } catch (IOException e) {
-            redirectAttributes.addFlashAttribute("error", "Erreur lors de l'upload de l'image");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Erreur lors de l'ajout du livre");
             return "admin/livres/form";
         }
 
@@ -121,7 +120,6 @@ public class LivreController {
     public String updateLivre(@PathVariable Long id,
                             @Valid @ModelAttribute("livre") Livre livre,
                             BindingResult result,
-                            @RequestParam(required = false) MultipartFile image,
                             Model model,
                             RedirectAttributes redirectAttributes) {
         Optional<Livre> existingLivreOpt = livreService.getLivreById(id);
@@ -141,17 +139,16 @@ public class LivreController {
         }
 
         livre.setIdLivre(id);
-        if (image == null || image.isEmpty()) {
-            // Conserver l'image existante
+        // Si l'URL de l'image est vide, on conserve l'ancienne valeur
+        if (livre.getImageUrl() == null || livre.getImageUrl().isEmpty()) {
             Livre existingLivre = existingLivreOpt.get();
-            livre.setImage(existingLivre.getImageNom(), existingLivre.getImageType(), existingLivre.getImageDonnees());
+            livre.setImageUrl(existingLivre.getImageUrl());
         }
-
         try {
-            livreService.saveLivreWithImage(livre, image);
+            livreService.saveLivre(livre);
             redirectAttributes.addFlashAttribute("success", "Livre mis à jour avec succès");
-        } catch (IOException e) {
-            redirectAttributes.addFlashAttribute("error", "Erreur lors de l'upload de l'image");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Erreur lors de la mise à jour du livre");
             return "admin/livres/form";
         }
 
@@ -175,29 +172,7 @@ public class LivreController {
         return "redirect:/livres/admin/list";
     }
 
-    @GetMapping("/image/{id}")
-    public ResponseEntity<byte[]> getImage(@PathVariable Long id) {
-        Optional<Livre> livreOpt = livreService.getLivreById(id);
-        if (livreOpt.isPresent() && livreOpt.get().hasImage()) {
-            Livre livre = livreOpt.get();
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(livre.getImageType()))
-                    .body(livre.getImageDonnees());
-        }
-        return ResponseEntity.notFound().build();
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/admin/{id}/delete-image")
-    public String deleteImage(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        try {
-            livreService.deleteImage(id);
-            redirectAttributes.addFlashAttribute("success", "Image supprimée avec succès");
-        } catch (EntityNotFoundException e) {
-            redirectAttributes.addFlashAttribute("error", "Livre non trouvé");
-        }
-        return "redirect:/livres/admin/edit/" + id;
-    }
+    // Je supprime la méthode getImage (endpoint /image/{id}) et deleteImage car on ne gère plus d'image binaire
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin/list")

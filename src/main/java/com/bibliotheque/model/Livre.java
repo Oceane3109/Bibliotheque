@@ -43,16 +43,6 @@ public class Livre {
     @Column(name = "age_minimum")
     private Integer ageMinimum;
 
-    @Column(name = "image_nom")
-    private String imageNom;
-
-    @Column(name = "image_type")
-    private String imageType;
-
-    @Lob
-    @Column(name = "image_donnees")
-    private byte[] imageDonnees;
-
     @Column(name = "image_url")
     private String imageUrl;
 
@@ -119,30 +109,6 @@ public class Livre {
         this.ageMinimum = ageMinimum;
     }
 
-    public String getImageNom() {
-        return imageNom;
-    }
-
-    public void setImageNom(String imageNom) {
-        this.imageNom = imageNom;
-    }
-
-    public String getImageType() {
-        return imageType;
-    }
-
-    public void setImageType(String imageType) {
-        this.imageType = imageType;
-    }
-
-    public byte[] getImageDonnees() {
-        return imageDonnees;
-    }
-
-    public void setImageDonnees(byte[] imageDonnees) {
-        this.imageDonnees = imageDonnees;
-    }
-
     public String getImageUrl() {
         return imageUrl;
     }
@@ -188,22 +154,18 @@ public class Livre {
     }
 
     public String getImageContentType() {
-        return imageType;
+        return null; // imageType removed, so return null
     }
 
     public void setImage(String nom, String type, byte[] donnees) {
-        this.imageNom = nom;
-        this.imageType = type;
-        this.imageDonnees = donnees;
+        // imageNom, imageType, imageDonnees removed, so this method is no longer needed
     }
 
     public void supprimerImage() {
-        this.imageNom = null;
-        this.imageType = null;
-        this.imageDonnees = null;
+        // imageNom, imageType, imageDonnees removed, so this method is no longer needed
     }
 
     public boolean hasImage() {
-        return imageNom != null && imageDonnees != null && imageDonnees.length > 0;
+        return imageUrl != null && !imageUrl.isEmpty();
     }
 } 
