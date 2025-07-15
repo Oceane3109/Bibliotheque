@@ -64,11 +64,14 @@ public class LivreController {
 
     @GetMapping("/{id}")
     public String showLivre(@PathVariable Long id, Model model) {
-        Optional<Livre> livreOpt = livreService.getLivreById(id);
+        Optional<Livre> livreOpt = livreService.getLivreWithExemplairesById(id);
         if (livreOpt.isEmpty()) {
             return "redirect:/livres";
         }
-        model.addAttribute("livre", livreOpt.get());
+        Livre livre = livreOpt.get();
+        long nombreExemplairesDisponibles = livre.getExemplaires().stream().filter(ex -> ex.estDisponible()).count();
+        model.addAttribute("livre", livre);
+        model.addAttribute("nombreExemplairesDisponibles", nombreExemplairesDisponibles);
         return "livre/detail";
     }
 

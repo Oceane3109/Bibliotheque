@@ -1,5 +1,7 @@
 package com.bibliotheque.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.NoArgsConstructor;
@@ -21,6 +23,7 @@ public class Exemplaire {
 
     @ManyToOne
     @JoinColumn(name = "id_livre", nullable = false)
+    @JsonBackReference
     private Livre livre;
 
     @NotBlank(message = "Le code exemplaire est obligatoire")
@@ -35,6 +38,7 @@ public class Exemplaire {
     private String notes;
 
     @OneToMany(mappedBy = "exemplaire")
+    @JsonIgnore
     private List<PretLivre> prets = new ArrayList<>();
 
     // Getters et Setters

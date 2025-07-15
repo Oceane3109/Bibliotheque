@@ -5,6 +5,9 @@ import com.bibliotheque.model.Abonnement;
 import com.bibliotheque.service.AdherentService;
 import com.bibliotheque.service.AbonnementService;
 import com.bibliotheque.service.TypeAdherentService;
+import com.bibliotheque.service.PenaliteService;
+import com.bibliotheque.service.NotificationService;
+import com.bibliotheque.service.UserPenaliseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -13,6 +16,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,12 +34,18 @@ public class AdminAdherentController {
     private final AdherentService adherentService;
     private final TypeAdherentService typeAdherentService;
     private final AbonnementService abonnementService;
+    private final PenaliteService penaliteService;
+    private final NotificationService notificationService;
+    private final UserPenaliseService userPenaliseService;
 
     @Autowired
-    public AdminAdherentController(AdherentService adherentService, TypeAdherentService typeAdherentService, AbonnementService abonnementService) {
+    public AdminAdherentController(AdherentService adherentService, TypeAdherentService typeAdherentService, AbonnementService abonnementService, PenaliteService penaliteService, NotificationService notificationService, UserPenaliseService userPenaliseService) {
         this.adherentService = adherentService;
         this.typeAdherentService = typeAdherentService;
         this.abonnementService = abonnementService;
+        this.penaliteService = penaliteService;
+        this.notificationService = notificationService;
+        this.userPenaliseService = userPenaliseService;
     }
 
     @GetMapping("/list")
@@ -125,5 +136,65 @@ public class AdminAdherentController {
             redirectAttributes.addFlashAttribute("error", "Erreur lors de la sauvegarde. Merci de vérifier les champs et réessayer.");
             return "redirect:/admin/adherents/edit/" + id;
         }
+    }
+
+    @GetMapping("/{id}/json")
+    @ResponseBody
+    public ResponseEntity<?> detailAdherentAdminJson(@PathVariable Long id) {
+        Optional<Adherent> adherentOpt = adherentService.getAdherentByIdWithPrets(id);
+        if (adherentOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Adherent adherent = adherentOpt.get();
+        // Infos quotas et compteurs
+        int nbPretsEnCours = adherent.getPrets() != null ? (int) adherent.getPrets().stream().filter(p -> "en_cours".equals(p.getEtatPret())).count() : 0;
+        int nbReservations = adherentService.countReservationsByAdherentId(adherent.getIdAdherent());
+        int nbProlongements = adherentService.countProlongementsByAdherentId(adherent.getIdAdherent());
+        // Pénalités
+        boolean penalise = userPenaliseService.isAdherentPenalise(adherent);
+        var penalites = penaliteService.getPenalitesByAdherent(adherent);
+        // Abonnement
+        var abonnementOpt = abonnementService.getAbonnementActifByAdherent(adherent);
+        boolean abonnementActif = abonnementOpt.isPresent();
+        var detailsAbonnement = abonnementOpt.map(ab -> java.util.Map.of(
+            "dateDebut", ab.getDateDebut(),
+            "dateFin", ab.getDateFin(),
+            "statut", ab.getStatut()
+        )).orElse(null);
+        // Notifications non lues
+        int notificationsNonLues = notificationService.getNotificationsNonLuesByAdherent(adherent).size();
+        // Construction de la réponse JSON
+        java.util.Map<String, Object> result = new java.util.HashMap<>();
+        result.put("id", adherent.getIdAdherent());
+        result.put("nom", adherent.getNom());
+        result.put("prenom", adherent.getPrenom());
+        result.put("adresse", adherent.getAdresse());
+        result.put("email", adherent.getEmail());
+        result.put("telephone", adherent.getTelephone());
+        result.put("dateNaissance", adherent.getDateNaissance());
+        result.put("dateInscription", adherent.getDateInscription());
+        result.put("typeAdherent", adherent.getTypeAdherent() != null ? java.util.Map.of(
+            "nomType", adherent.getTypeAdherent().getNomType(),
+            "description", adherent.getTypeAdherent().getDescription()
+        ) : null);
+        result.put("user", adherent.getUser() != null ? java.util.Map.of(
+            "nomUtilisateur", adherent.getUser().getNomUtilisateur(),
+            "email", adherent.getUser().getEmail()
+        ) : null);
+        result.put("maxLivresDomicile", adherent.getMaxLivresDomicile());
+        result.put("maxLivresSurplace", adherent.getMaxLivresSurplace());
+        result.put("livresEmpruntesDomicile", adherent.getLivresEmpruntesDomicile());
+        result.put("livresEmpruntesSurplace", adherent.getLivresEmpruntesSurplace());
+        result.put("dureePret", adherent.getDureePret());
+        result.put("quotaProlongements", adherent.getQuotaProlongements());
+        result.put("nbProlongementsEffectues", nbProlongements);
+        result.put("nbPretsEnCours", nbPretsEnCours);
+        result.put("nbReservations", nbReservations);
+        result.put("penalise", penalise);
+        result.put("penalites", penalites);
+        result.put("abonnementActif", abonnementActif);
+        result.put("detailsAbonnementActif", detailsAbonnement);
+        result.put("notificationsNonLues", notificationsNonLues);
+        return ResponseEntity.ok(result);
     }
 } 

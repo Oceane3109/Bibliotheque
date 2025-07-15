@@ -116,7 +116,7 @@
                         <div class="alert alert-info" role="alert">
                             <i class="bi bi-info-circle"></i>
                             Exemplaires disponibles : 
-                            <strong th:text="${livre.nombreExemplairesDisponibles}">0</strong>
+                            <strong th:text="${nombreExemplairesDisponibles}">0</strong>
                         </div>
 
                         <div th:if="${livre.exemplaires.isEmpty()}" class="alert alert-warning">
@@ -129,7 +129,6 @@
                                 <tr>
                                     <th>Code</th>
                                     <th>État</th>
-                                    <th>Date d'acquisition</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -144,9 +143,6 @@
                                               th:text="${exemplaire.etat}">
                                             État
                                         </span>
-                                    </td>
-                                    <td th:text="${#temporals.format(exemplaire.dateAcquisition, 'dd/MM/yyyy')}">
-                                        Date
                                     </td>
                                 </tr>
                             </tbody>

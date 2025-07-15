@@ -47,11 +47,6 @@
                         </select>
                         <div class="text-danger" th:if="${#fields.hasErrors('etat')}" th:errors="*{etat}"></div>
                     </div>
-                    <div class="mb-3">
-                        <label for="dateAcquisition" class="form-label">Date d'acquisition</label>
-                        <input type="date" class="form-control" id="dateAcquisition" th:field="*{dateAcquisition}">
-                        <div class="text-danger" th:if="${#fields.hasErrors('dateAcquisition')}" th:errors="*{dateAcquisition}"></div>
-                    </div>
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary">
                             <i class="bi bi-save"></i> <span th:text="${exemplaire.idExemplaire == null ? 'Ajouter' : 'Enregistrer'}">Submit</span>
