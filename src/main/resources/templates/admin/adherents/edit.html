@@ -104,7 +104,7 @@
                 <label class="form-label">Abonnement</label>
                 <div>
                     <span>
-                        <span th:switch="${abonnement.statut}">
+                        <span th:if="${abonnement != null}" th:switch="${abonnement.statut}">
                             <span th:case="'valide'" class="badge bg-success">
                                 <i class="bi bi-check-circle"></i> Actif jusqu'au <span th:text="${#temporals.format(abonnement.dateFin, 'dd/MM/yyyy')}"></span>
                             </span>
@@ -128,7 +128,8 @@
                                 <i class="bi bi-clock-history"></i> Expiré
                             </span>
                         </span>
-                    </div>
+                        <span th:if="${abonnement == null}">Aucun abonnement</span>
+                    </span>
                 </div>
             </div>
         </div>

@@ -9,7 +9,6 @@ import java.util.Optional;
 
 public interface LivreService {
     Livre saveLivre(Livre livre);
-    Livre saveLivreWithImage(Livre livre, MultipartFile image) throws IOException;
     Optional<Livre> getLivreById(Long id);
     Optional<Livre> getLivreByIsbn(String isbn);
     List<Livre> getAllLivres();
@@ -21,11 +20,6 @@ public interface LivreService {
     void deleteLivre(Long id);
     boolean existsByIsbn(String isbn);
     
-    // Méthodes de gestion des images
-    void updateImage(Long livreId, MultipartFile image) throws IOException;
-    void deleteImage(Long livreId);
-    byte[] getImageData(Long livreId);
-
     List<Livre> getAllLivresWithExemplaires();
 
     Optional<Livre> getLivreWithExemplairesById(Long id);

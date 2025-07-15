@@ -7,9 +7,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,17 +27,8 @@ public class LivreServiceImpl implements LivreService {
         return livreRepository.save(livre);
     }
 
-    @Override
-    public Livre saveLivreWithImage(Livre livre, MultipartFile image) throws IOException {
-        if (image != null && !image.isEmpty()) {
-            livre.setImage(
-                image.getOriginalFilename(),
-                image.getContentType(),
-                image.getBytes()
-            );
-        }
-        return livreRepository.save(livre);
-    }
+    // Je supprime toute la logique liée à l'image binaire (MultipartFile image, setImage, etc.)
+    // Je ne garde que la gestion du champ imageUrl
 
     @Override
     public Optional<Livre> getLivreById(Long id) {
@@ -94,39 +83,6 @@ public class LivreServiceImpl implements LivreService {
     @Override
     public boolean existsByIsbn(String isbn) {
         return livreRepository.existsByIsbn(isbn);
-    }
-
-    @Override
-    @Transactional
-    public void updateImage(Long livreId, MultipartFile image) throws IOException {
-        Livre livre = livreRepository.findById(livreId)
-            .orElseThrow(() -> new EntityNotFoundException("Livre non trouvé avec l'ID: " + livreId));
-
-        if (image != null && !image.isEmpty()) {
-            livre.setImage(
-                image.getOriginalFilename(),
-                image.getContentType(),
-                image.getBytes()
-            );
-            livreRepository.save(livre);
-        }
-    }
-
-    @Override
-    @Transactional
-    public void deleteImage(Long livreId) {
-        Livre livre = livreRepository.findById(livreId)
-            .orElseThrow(() -> new EntityNotFoundException("Livre non trouvé avec l'ID: " + livreId));
-
-        livre.supprimerImage();
-        livreRepository.save(livre);
-    }
-
-    @Override
-    public byte[] getImageData(Long livreId) {
-        return livreRepository.findById(livreId)
-            .map(Livre::getImageDonnees)
-            .orElseThrow(() -> new EntityNotFoundException("Livre non trouvé avec l'ID: " + livreId));
     }
 
     @Override
