@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="sidebar-admin">
+        <nav class="sidebar">
+            <div class="sidebar-header">Admin</div>
+            <a href="/admin/dashboard"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a>
+            <a href="/admin/livres/list"><i class="bi bi-book me-2"></i>Livres</a>
+            <a href="/admin/adherents/list"><i class="bi bi-people me-2"></i>Adhérents</a>
+            <a href="/admin/prets/list"><i class="bi bi-list-check me-2"></i>Prêts</a>
+            <a href="/admin/reservations"><i class="bi bi-bookmark-check me-2"></i>Réservations</a>
+            <a href="/admin/prolongements"><i class="bi bi-clock-history me-2"></i>Prolongements</a>
+            <a href="/admin/penalites/list"><i class="bi bi-exclamation-triangle me-2"></i>Pénalités</a>
+            <a href="/admin/notifications/list"><i class="bi bi-bell me-2"></i>Notifications</a>
+            <form th:action="@{/logout}" method="post" style="display: inline;">
+                <button type="submit" class="btn btn-link text-white text-start w-100" style="border: none; background: none; padding: 12px 20px;">
+                    <i class="bi bi-box-arrow-right me-2"></i>Déconnexion
+                </button>
+            </form>
+        </nav>
+    </div>
+    <div th:fragment="sidebar-adherent">
+        <nav class="sidebar">
+            <div class="sidebar-header">Adhérent</div>
+            <a href="/adherent/dashboard"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a>
+            <a href="/adherent/catalogue"><i class="bi bi-book me-2"></i>Catalogue</a>
+            <a href="/adherent/mes-prets"><i class="bi bi-list-check me-2"></i>Mes prêts</a>
+            <a href="/adherent/mes-reservations"><i class="bi bi-bookmark-check me-2"></i>Mes réservations</a>
+            <a href="/adherent/mes-prolongements"><i class="bi bi-clock-history me-2"></i>Mes prolongements</a>
+            <a href="/adherent/mes-notifications"><i class="bi bi-bell me-2"></i>Mes notifications</a>
+            <a href="/adherent/statistiques"><i class="bi bi-bar-chart me-2"></i>Mes statistiques</a>
+            <a href="/adherent/profile"><i class="bi bi-person me-2"></i>Mon profil</a>
+            <form th:action="@{/logout}" method="post" style="display: inline;">
+                <button type="submit" class="btn btn-link text-white text-start w-100" style="border: none; background: none; padding: 12px 20px;">
+                    <i class="bi bi-box-arrow-right me-2"></i>Déconnexion
+                </button>
+            </form>
+        </nav>
+    </div>
+</body>
+</html>

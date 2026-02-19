@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Inscription - Bibliothèque</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+</head>
+<body>
+    <div class="auth-container">
+        <h2>Inscription</h2>
+        <form th:action="@{/users/register}" th:object="${user}" method="post" class="auth-form">
+            <div class="form-group">
+                <label for="nomUtilisateur">Nom d'utilisateur</label>
+                <input type="text" id="nomUtilisateur" th:field="*{nomUtilisateur}" required>
+                <span class="error" th:if="${#fields.hasErrors('nomUtilisateur')}" th:errors="*{nomUtilisateur}"></span>
+                <span class="error" th:if="${usernameError}" th:text="${usernameError}"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" th:field="*{email}" required>
+                <span class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+                <span class="error" th:if="${emailError}" th:text="${emailError}"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="motDePasse">Mot de passe</label>
+                <input type="password" id="motDePasse" th:field="*{motDePasse}" required>
+                <span class="error" th:if="${#fields.hasErrors('motDePasse')}" th:errors="*{motDePasse}"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">S'inscrire</button>
+        </form>
+        <div class="auth-links">
+            <p>Déjà inscrit ? <a th:href="@{/login}">Se connecter</a></p>
+        </div>
+    </div>
+</body>
+</html> 

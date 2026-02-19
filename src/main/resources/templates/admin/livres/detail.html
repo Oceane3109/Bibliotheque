@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Détail du livre</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/sidebar-theme.css}">
+</head>
+<body class="d-flex">
+    <div th:replace="~{shared/sidebar :: sidebar-admin}"></div>
+    <main class="flex-fill p-4">
+
+<div class="container mt-4">
+    <h1>Détail du livre</h1>
+    <div class="card">
+        <div class="card-body">
+            <h3 th:text="${livre.titre}">Titre</h3>
+            <p><strong>Auteur :</strong> <span th:text="${livre.auteur}">Auteur</span></p>
+            <p><strong>Éditeur :</strong> <span th:text="${livre.editeur}">Éditeur</span></p>
+            <p><strong>ISBN :</strong> <span th:text="${livre.isbn}">ISBN</span></p>
+            <p><strong>Année de publication :</strong> <span th:text="${livre.anneePublication}">Année</span></p>
+            <!--
+            <p>
+                <strong>Nombre d'exemplaires :</strong>
+                <span th:text="${livre.exemplaires.size()}"></span><br>
+                <strong>Disponibles :</strong>
+                <span th:text="${livre.nombreExemplairesDisponibles}"></span>
+            </p>
+            -->
+            <ul>
+                <li th:each="ex : ${livre.exemplaires}">
+                    <span th:text="${ex.codeExemplaire}"></span> -
+                    <span th:text="${ex.etat}"></span>
+                </li>
+            </ul>
+            <a href="/admin/livres/list" class="btn btn-secondary mt-3">Retour à la liste</a>
+        </div>
+    </div>
+</div>
+    </main>
+</body>
+</html> 

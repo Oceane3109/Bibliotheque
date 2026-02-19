@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des Livres</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="row mb-4">
+            <div class="col">
+                <h1>Liste des Livres</h1>
+            </div>
+            <div class="col text-end" sec:authorize="hasRole('ADMIN')">
+                <a href="/livres/admin/create" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Ajouter un livre
+                </a>
+            </div>
+        </div>
+
+        <!-- Formulaire de recherche -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form th:action="@{/livres/search}" method="get" class="row g-3">
+                    <div class="col-md-5">
+                        <input type="text" class="form-control" id="titre" name="titre" 
+                               placeholder="Rechercher par titre" th:value="${param.titre}">
+                    </div>
+                    <div class="col-md-5">
+                        <input type="text" class="form-control" id="auteur" name="auteur" 
+                               placeholder="Rechercher par auteur" th:value="${param.auteur}">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-search"></i> Rechercher
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Messages de succès/erreur -->
+        <div th:if="${success}" class="alert alert-success" role="alert">
+            <i class="bi bi-check-circle"></i> <span th:text="${success}">Success</span>
+        </div>
+        <div th:if="${error}" class="alert alert-danger" role="alert">
+            <i class="bi bi-exclamation-triangle"></i> <span th:text="${error}">Error</span>
+        </div>
+
+        <!-- Liste des livres -->
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <div class="col" th:each="livre : ${livres}">
+                <div class="card h-100">
+                    <!-- Image du livre -->
+                    <div class="card-img-top text-center p-3" style="height: 300px;">
+                        <img th:if="${livre.hasImage()}" 
+                             th:src="@{/livres/image/{id}(id=${livre.idLivre})}"
+                             class="img-fluid h-100 object-fit-contain"
+                             alt="Couverture du livre">
+                        <div th:unless="${livre.hasImage()}" 
+                             class="d-flex align-items-center justify-content-center h-100 bg-light">
+                            <i class="bi bi-book" style="font-size: 5rem;"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${livre.titre}">Titre du livre</h5>
+                        <p class="card-text">
+                            <strong>Auteur:</strong> <span th:text="${livre.auteur}">Auteur</span><br>
+                            <strong>ISBN:</strong> <span th:text="${livre.isbn ?: 'Non renseigné'}">ISBN</span><br>
+                            <strong>Éditeur:</strong> <span th:text="${livre.editeur ?: 'Non renseigné'}">Éditeur</span><br>
+                            <strong>Année:</strong> <span th:text="${livre.anneePublication ?: 'Non renseignée'}">Année</span><br>
+                            <strong>Âge minimum:</strong> <span th:text="${livre.ageMinimum ?: 'Aucun'}">Âge</span><br>
+                            <strong>Exemplaires disponibles:</strong> 
+                            <span th:text="${livre.nombreExemplairesDisponibles}">0</span>
+                        </p>
+                    </div>
+                    
+                    <div class="card-footer">
+                        <div class="d-flex justify-content-between">
+                            <a th:href="@{/livres/{id}(id=${livre.idLivre})}" 
+                               class="btn btn-info">
+                                <i class="bi bi-eye"></i> Détails
+                            </a>
+                            <div sec:authorize="hasRole('ADMIN')">
+                                <a th:href="@{/livres/admin/edit/{id}(id=${livre.idLivre})}" 
+                                   class="btn btn-warning me-2">
+                                    <i class="bi bi-pencil"></i> Modifier
+                                </a>
+                                <button type="button" class="btn btn-danger"
+                                        data-bs-toggle="modal" 
+                                        th:data-bs-target="'#deleteModal' + ${livre.idLivre}">
+                                    <i class="bi bi-trash"></i> Supprimer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal de confirmation de suppression -->
+                <div class="modal fade" th:id="'deleteModal' + ${livre.idLivre}" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Confirmer la suppression</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                Êtes-vous sûr de vouloir supprimer le livre 
+                                "<span th:text="${livre.titre}"></span>" ?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                <form th:action="@{/livres/admin/delete/{id}(id=${livre.idLivre})}" 
+                                      method="post" style="display: inline;">
+                                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Message si aucun livre -->
+        <div th:if="${#lists.isEmpty(livres)}" class="alert alert-info" role="alert">
+            <i class="bi bi-info-circle"></i> Aucun livre trouvé.
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Réservations</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/sidebar-theme.css}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+</head>
+<body class="d-flex">
+    <div th:replace="~{shared/sidebar :: sidebar-admin}"></div>
+    <main class="flex-fill p-4">
+
+    <div class="container mt-4">
+        <div class="row mb-4">
+            <div class="col">
+                <h1>Réservations</h1>
+            </div>
+            <div class="col text-end">
+                <a href="/admin/reservations/create" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Ajouter une réservation
+                </a>
+            </div>
+        </div>
+
+        <!-- Messages de succès/erreur -->
+        <div th:if="${success}" class="alert alert-success" role="alert">
+            <i class="bi bi-check-circle"></i> <span th:text="${success}">Success</span>
+        </div>
+        <div th:if="${error}" class="alert alert-danger" role="alert">
+            <i class="bi bi-exclamation-triangle"></i> <span th:text="${error}">Error</span>
+        </div>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Adhérent</th>
+                    <th>Livre</th>
+                    <th>Date début</th>
+                    <th>Date fin</th>
+                    <th>État</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="reservation : ${reservations}">
+                    <td th:text="${reservation.adherent.nom + ' ' + reservation.adherent.prenom}">Adhérent</td>
+                    <td th:text="${reservation.livre.titre}">Livre</td>
+                    <td th:text="${#temporals.format(reservation.dateReservation, 'dd/MM/yyyy')}">Date début</td>
+                    <td th:text="${reservation.dateDisponibilite != null ? #temporals.format(reservation.dateDisponibilite, 'dd/MM/yyyy') : 'Non définie'}">Date fin</td>
+                    <td>
+                        <span th:class="${'badge ' + 
+                            (reservation.etatReservation == 'active' ? 'bg-success' : 
+                             reservation.etatReservation == 'confirmee' ? 'bg-primary' :
+                             reservation.etatReservation == 'expiree' ? 'bg-warning' :
+                             reservation.etatReservation == 'annulee' ? 'bg-danger' : 'bg-secondary')}"
+                              th:text="${reservation.etatReservation}">État</span>
+                    </td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <a th:href="@{/admin/reservations/edit/{id}(id=${reservation.idReservation})}" class="btn btn-sm btn-outline-warning" title="Modifier">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form th:action="@{/admin/reservations/confirm/{id}(id=${reservation.idReservation})}" method="post" th:if="${reservation.etatReservation == 'en_attente'}" style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-success" title="Confirmer">
+                                    <i class="bi bi-check-circle"></i>
+                                </button>
+                            </form>
+                            <form th:action="@{/admin/reservations/delete/{id}(id=${reservation.idReservation})}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Supprimer cette réservation ?');">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div th:if="${#lists.isEmpty(reservations)}" class="alert alert-info" role="alert">
+            <i class="bi bi-info-circle"></i> Aucune réservation enregistrée.
+        </div>
+        <div class="d-flex justify-content-end mt-2">
+            <a href="/admin/dashboard" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Retour au dashboard
+            </a>
+        </div>
+    </div> <!-- fin .container -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </main>
+</body>
+</html> 

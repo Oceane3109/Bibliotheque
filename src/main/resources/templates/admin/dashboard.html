@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/sidebar-theme.css}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Graphique pleine largeur */
+        #chartContainer { width: 100%; height: 320px; margin: 0 auto; }
+        #statsChart { width: 100% !important; height: 320px !important; max-width: 100%; max-height: 100%; display: block; }
+        .chart-card { border: 1px solid rgba(20, 33, 61, 0.08); border-radius: 16px; box-shadow: var(--shadow-soft); background: #fff; }
+        .chart-card .card-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    </style>
+</head>
+<body class="d-flex">
+    <div th:replace="~{shared/sidebar :: sidebar-admin}"></div>
+    <main class="flex-fill p-4">
+
+        <h1 class="page-title">Bienvenue sur le dashboard administrateur</h1>
+        <p>Utilise le menu à gauche pour naviguer dans les différentes sections.</p>
+
+        <!-- Résumé d'activité -->
+        <div class="row mb-4">
+            <div class="col-md-2">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-book" style="font-size: 2rem; color: #007bff;"></i>
+                        <h4 th:text="${totalLivres}">0</h4>
+                        <p class="text-muted">Livres</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-people" style="font-size: 2rem; color: #28a745;"></i>
+                        <h4 th:text="${totalAdherents}">0</h4>
+                        <p class="text-muted">Adhérents</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-list" style="font-size: 2rem; color: #ffc107;"></i>
+                        <h4 th:text="${totalPretsActifs}">0</h4>
+                        <p class="text-muted">Prêts actifs</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-bookmark" style="font-size: 2rem; color: #17a2b8;"></i>
+                        <h4 th:text="${totalReservations}">0</h4>
+                        <p class="text-muted">Réservations</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-exclamation-triangle" style="font-size: 2rem; color: #dc3545;"></i>
+                        <h4 th:text="${totalPenalites}">0</h4>
+                        <p class="text-muted">Pénalités</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-bell" style="font-size: 2rem; color: #6f42c1;"></i>
+                        <h4 th:text="${totalNotifications}">0</h4>
+                        <p class="text-muted">Notifications</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions rapides -->
+        <div class="row mb-4">
+            <div class="col-md-2">
+                <a href="/livres/admin/create" class="btn btn-primary w-100 mb-2">
+                    <i class="bi bi-plus-circle"></i> Ajouter un livre
+                </a>
+            </div>
+            <div class="col-md-2">
+                <a href="/admin/adherents/create" class="btn btn-success w-100 mb-2">
+                    <i class="bi bi-person-plus"></i> Ajouter un adhérent
+                </a>
+            </div>
+            <div class="col-md-2">
+                <a href="/admin/prets/create" class="btn btn-warning w-100 mb-2">
+                    <i class="bi bi-arrow-right-circle"></i> Nouveau prêt
+                </a>
+            </div>
+            <div class="col-md-2">
+                <a href="/admin/reservations/create" class="btn btn-primary w-100 mb-2">
+                    <i class="bi bi-calendar-plus"></i> Nouvelle réservation
+                </a>
+            </div>
+            <div class="col-md-2">
+                <a href="/admin/penalites/create" class="btn btn-danger w-100 mb-2">
+                    <i class="bi bi-exclamation-circle"></i> Nouvelle pénalité
+                </a>
+            </div>
+            <div class="col-md-2">
+                <a href="/admin/notifications/create" class="btn btn-info w-100 mb-2">
+                    <i class="bi bi-bell-plus"></i> Nouvelle notification
+                </a>
+            </div>
+            <div class="col-md-2">
+                <a href="/admin/prolongements" class="btn btn-warning w-100 mb-2">
+                    <i class="bi bi-clock-history"></i> Gérer les prolongements
+                </a>
+            </div>
+        </div>
+
+        <!-- Graphique statistiques -->
+        <div class="mb-4">
+            <div class="card chart-card">
+                <div class="card-header">
+                    <h5 class="mb-0">Statistiques globales</h5>
+                    <select id="chartTypeSelect" class="form-select form-select-sm w-auto">
+                        <option value="bar">Graphique à barres</option>
+                        <option value="pie">Camembert</option>
+                    </select>
+                </div>
+                <div class="card-body">
+                    <div id="chartContainer">
+                        <canvas id="statsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Derniers avis/notes -->
+        <div class="mb-4">
+            <h5 class="mb-3">Derniers avis/notes</h5>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Livre</th>
+                            <th>Adhérent</th>
+                            <th>Note</th>
+                            <th>Commentaire</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="avis : ${lastAvis}">
+                            <td th:text="${avis[0]}">Livre</td>
+                            <td th:text="${avis[1]} + ' ' + ${avis[2]}">Adhérent</td>
+                            <td th:text="${avis[3]}">Note</td>
+                            <td th:text="${avis[4]}">Commentaire</td>
+                            <td th:text="${#temporals.format(avis[5], 'dd/MM/yyyy')}">Date</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Préparation pour listes avec actions -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> Utilise le menu à gauche pour accéder aux listes détaillées (Livres, Adhérents, Prêts, etc.) et gérer chaque élément (voir, modifier, supprimer).
+                </div>
+            </div>
+        </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:inline="javascript">
+    /*<![CDATA[*/
+    var totalLivres = [[${totalLivres}]];
+    var totalAdherents = [[${totalAdherents}]];
+    var totalPretsActifs = [[${totalPretsActifs}]];
+    var totalReservations = [[${totalReservations}]];
+    var totalPenalites = [[${totalPenalites}]];
+    var totalNotifications = [[${totalNotifications}]];
+
+    var chartInstance = null;
+
+    function renderChart(type) {
+      const ctx = document.getElementById('statsChart').getContext('2d');
+      if (chartInstance) {
+        chartInstance.destroy();
+      }
+      chartInstance = new Chart(ctx, {
+        type: type,
+        data: {
+          labels: ['Livres', 'Adhérents', 'Prêts actifs', 'Réservations', 'Pénalités', 'Notifications'],
+          datasets: [{
+            label: 'Total',
+            data: [
+              totalLivres,
+              totalAdherents,
+              totalPretsActifs,
+              totalReservations,
+              totalPenalites,
+              totalNotifications
+            ],
+            backgroundColor: [
+              '#1565c0', '#fca311', '#2a9d8f', '#e76f51', '#bfa100', '#6d6875'
+            ],
+            borderWidth: 0,
+            borderRadius: type === 'bar' ? 8 : 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: { color: '#14213d', boxWidth: 16, boxHeight: 16 }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(20,33,61,0.9)',
+              titleColor: '#fff',
+              bodyColor: '#fff',
+              padding: 10,
+              borderWidth: 0
+            }
+          },
+          scales: type === 'bar' ? {
+            x: {
+              ticks: { color: '#4b5563' },
+              grid: { display: false }
+            },
+            y: {
+              ticks: { color: '#4b5563' },
+              grid: { color: 'rgba(20,33,61,0.08)' }
+            }
+          } : {}
+        }
+      });
+    }
+
+    window.onload = function() {
+      var select = document.getElementById('chartTypeSelect');
+      renderChart(select.value);
+
+      select.addEventListener('change', function() {
+        renderChart(this.value);
+      });
+    };
+    /*]]>*/
+    </script>
+    </main>
+</body>
+</html> 

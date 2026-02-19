@@ -1,0 +1,72 @@
+src/
+├── main/
+│   ├── java/
+│   │   └── com/
+│   │       └── bibliotheque/
+│   │           ├── config/
+│   │           │   ├── SecurityConfig.java
+│   │           │   └── WebMvcConfig.java
+│   │           ├── controller/
+│   │           │   ├── AdminController.java
+│   │           │   ├── AdherentController.java
+│   │           │   ├── AuthController.java
+│   │           │   ├── LivreController.java
+│   │           │   └── PretController.java
+│   │           ├── model/
+│   │           │   ├── Adherent.java
+│   │           │   ├── Exemplaire.java
+│   │           │   ├── Livre.java
+│   │           │   ├── Pret.java
+│   │           │   ├── Reservation.java
+│   │           │   ├── TypeAdherent.java
+│   │           │   └── User.java
+│   │           ├── repository/
+│   │           │   ├── AdherentRepository.java
+│   │           │   ├── ExemplaireRepository.java
+│   │           │   ├── LivreRepository.java
+│   │           │   ├── PretRepository.java
+│   │           │   └── UserRepository.java
+│   │           ├── service/
+│   │           │   ├── AdherentService.java
+│   │           │   ├── AuthService.java
+│   │           │   ├── LivreService.java
+│   │           │   └── PretService.java
+│   │           └── BibliothequeApplication.java
+│   ├── resources/
+│   │   ├── static/
+│   │   │   ├── css/
+│   │   │   │   └── style.css
+│   │   │   └── js/
+│   │   │       └── script.js
+│   │   ├── templates/
+│   │   │   ├── adherent/
+│   │   │   │   ├── dashboard.html
+│   │   │   │   ├── emprunts.html
+│   │   │   │   └── profil.html
+│   │   │   ├── admin/
+│   │   │   │   ├── adherents.html
+│   │   │   │   ├── dashboard.html
+│   │   │   │   ├── livres.html
+│   │   │   │   └── prets.html
+│   │   │   ├── auth/
+│   │   │   │   ├── login.html
+│   │   │   │   └── register.html
+│   │   │   ├── livre/
+│   │   │   │   ├── details.html
+│   │   │   │   └── liste.html
+│   │   │   └── shared/
+│   │   │       ├── footer.html
+│   │   │       ├── header.html
+│   │   │       └── layout.html
+│   │   ├── application.properties
+│   │   └── data.sql
+│   └── webapp/
+│       └── WEB-INF/
+└── test/
+    └── java/
+        └── com/
+            └── bibliotheque/
+                ├── repository/
+                │   └── AdherentRepositoryTest.java
+                └── service/
+                    └── AdherentServiceTest.java
